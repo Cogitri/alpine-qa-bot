@@ -5,5 +5,5 @@
  */
 [CCode (cprefix = "", lower_case_cprefix = "", cheader_filename = "config.h")]
 namespace Config {
-    public const string GITLAB_INSTANCE_URL;
+    public const string SYSCONFIG_DIR;
 }

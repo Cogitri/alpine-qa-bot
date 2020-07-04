@@ -25,7 +25,7 @@ add_project_arguments(
 
 # Configuration
 conf = configuration_data()
-conf.set_quoted('GITLAB_INSTANCE_URL', get_option('gitlab_instance_url'))
+conf.set_quoted('SYSCONFIG_DIR', get_option('sysconfdir'))
 configure_file(output: 'config.h', configuration: conf)
 # Include config.h
 add_project_arguments(

@@ -73,22 +73,25 @@ namespace AlpineQaBot {
     }
 
     public abstract class Job : GLib.Object {
-        protected Job (Project? project) {
+        protected Job (Project? project, string? gitlab_instance_url) {
             this.project = project;
+            this.gitlab_instance_url = gitlab_instance_url;
         }
 
-        protected Job.from_json_object (Json.Object root_obj) throws GLib.Error {
+        protected Job.from_json_object (Json.Object root_obj, string gitlab_instance_url) throws GLib.Error {
             this.project = Project (root_obj.get_int_member ("id"), root_obj.get_string_member ("name"));
+            this.gitlab_instance_url = gitlab_instance_url;
         }
 
         public abstract bool process();
 
+        public string? gitlab_instance_url { get; private set; }
         public Project? project { get; private set; }
     }
 
     public class JobShutdown : Job {
         public JobShutdown () {
-            base (null);
+            base (null, null);
         }
 
         public override bool process () {
@@ -98,16 +101,16 @@ namespace AlpineQaBot {
     }
 
     public class PipelineJob : Job {
-        public PipelineJob (Project project, string source) {
-            base (project);
+        public PipelineJob (Project project, string source, string gitlab_instance_url) {
+            base (project, gitlab_instance_url);
             this.source = source;
         }
 
-        public PipelineJob.from_json (string json) throws GLib.Error {
+        public PipelineJob.from_json (string json, string gitlab_instance_url) throws GLib.Error {
             var parser = new Json.Parser ();            parser.load_from_data (json);
             var root_object = parser.get_root ().get_object ();
 
-            base.from_json_object ((Json.Object)root_object.get_object_member ("project"));
+            base.from_json_object ((Json.Object)root_object.get_object_member ("project"), gitlab_instance_url);
             this.merge_request = MergeRequest.from_json_object ((Json.Object)root_object.get_object_member ("merge_request"));
             this.source = root_object.get_object_member ("object_attributes").get_string_member ("source");
             var object_attributes = root_object.get_object_member ("object_attributes");
@@ -145,7 +148,7 @@ namespace AlpineQaBot {
         public override bool process () {
             if (this.status == PipelineStatus.Failed || this.status == PipelineStatus.Success) {
                 var rest_proxy = new Rest.Proxy ("%s/projects/%d/merge_requests/%d", true);
-                rest_proxy.bind (Config.GITLAB_INSTANCE_URL, this.project.id, this._merge_request.iid);
+                rest_proxy.bind (this.gitlab_instance_url, this.project.id, this._merge_request.iid);
                 var rest_proxy_call = rest_proxy.new_call ();
 
                 if (this.status == PipelineStatus.Failed) {

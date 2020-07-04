@@ -1,1 +1,0 @@
-option('gitlab_instance_url', description: 'URL to the Gitlab instance this bot communicates with', type: 'string', value: 'https://gitlab.com')

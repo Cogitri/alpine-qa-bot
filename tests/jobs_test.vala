@@ -202,7 +202,7 @@ public void test_from_json () {
    """;
 
     try {
-        var job = new AlpineQaBot.PipelineJob.from_json (test_json);
+        var job = new AlpineQaBot.PipelineJob.from_json (test_json, "https://gitlab.com");
         assert (job != null);
         assert (job.source == "merge_request_event");
         assert (job.status == AlpineQaBot.PipelineStatus.Success);

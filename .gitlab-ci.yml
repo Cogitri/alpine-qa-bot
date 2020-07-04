@@ -1,0 +1,11 @@
+image: alpine:latest
+
+stages:
+  - test
+
+test:
+  stage: test
+  before_script:
+    - apk add meson vala glib-dev libsoup-dev json-glib-dev rest-dev alpine-sdk
+  script:
+    - meson build && ninja -C build test

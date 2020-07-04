@@ -111,10 +111,17 @@ namespace AlpineQaBot {
             var root_object = parser.get_root ().get_object ();
 
             base.from_json_object ((Json.Object)root_object.get_object_member ("project"), gitlab_instance_url);
-            this.merge_request = MergeRequest.from_json_object ((Json.Object)root_object.get_object_member ("merge_request"));
-            this.source = root_object.get_object_member ("object_attributes").get_string_member ("source");
-            var object_attributes = root_object.get_object_member ("object_attributes");
 
+            var merge_request_object = root_object.get_object_member ("merge_request");
+            if (merge_request_object == null) {
+                this.merge_request = null;
+            } else {
+                this.merge_request = MergeRequest.from_json_object ((Json.Object)merge_request_object);
+            }
+
+            this.source = root_object.get_object_member ("object_attributes").get_string_member ("source");
+
+            var object_attributes = root_object.get_object_member ("object_attributes");
             switch (object_attributes.get_string_member ("status")) {
             case "canceled":
                 this.status = PipelineStatus.Canceled;
@@ -146,7 +153,7 @@ namespace AlpineQaBot {
         }
 
         public override bool process () {
-            if (this.status == PipelineStatus.Failed || this.status == PipelineStatus.Success) {
+            if ((this.status == PipelineStatus.Failed || this.status == PipelineStatus.Success) && this.merge_request != null) {
                 var rest_proxy = new Rest.Proxy ("%s/projects/%d/merge_requests/%d", true);
                 rest_proxy.bind (this.gitlab_instance_url, this.project.id, this._merge_request.iid);
                 var rest_proxy_call = rest_proxy.new_call ();
@@ -176,6 +183,6 @@ namespace AlpineQaBot {
 
         public string source { get; private set; }
         public PipelineStatus status { get; private set; }
-        public MergeRequest merge_request { get; private set; }
+        public MergeRequest? merge_request { get; private set; }
     }
 }

@@ -32,7 +32,7 @@ public int main (string[] args) {
     try {
         ev = new AlpineQaBot.WebHookEventListenerServer (gitlab_instance_url, gitlab_token, server_port);
     } catch (Error e) {
-        warning ("Failed to listen on port 8080 due to error %s", e.message);
+        error ("Failed to listen on port %u due to error %s", server_port, e.message);
     }
     new AlpineQaBot.Worker (ev.job_queue);
     loop.run ();

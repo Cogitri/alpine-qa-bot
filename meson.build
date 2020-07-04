@@ -25,7 +25,7 @@ add_project_arguments(
 
 # Configuration
 conf = configuration_data()
-conf.set_quoted('SYSCONFIG_DIR', get_option('sysconfdir'))
+conf.set_quoted('SYSCONFIG_DIR', get_option('prefix') / get_option('sysconfdir'))
 configure_file(output: 'config.h', configuration: conf)
 # Include config.h
 add_project_arguments(
@@ -34,4 +34,5 @@ add_project_arguments(
 )
 
 subdir('alpine-qa-bot')
+subdir('data')
 subdir('tests')

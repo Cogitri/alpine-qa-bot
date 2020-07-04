@@ -7,7 +7,7 @@ public int main (string[] args) {
     assert (GLib.Thread.supported ());
 
     var key_file = new GLib.KeyFile ();
-    var key_file_path = "%s/alpine-qa-bot.config".printf (Config.SYSCONFIG_DIR);
+    var key_file_path = "%s/alpine-qa-bot/alpine-qa-bot.config".printf (Config.SYSCONFIG_DIR);
     try {
         key_file.load_from_file (key_file_path, GLib.KeyFileFlags.NONE);
     } catch (GLib.FileError e) {

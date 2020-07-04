@@ -107,7 +107,8 @@ namespace AlpineQaBot {
         }
 
         public PipelineJob.from_json (string json, string gitlab_instance_url) throws GLib.Error {
-            var parser = new Json.Parser ();            parser.load_from_data (json);
+            var parser = new Json.Parser ();
+            parser.load_from_data (json);
             var root_object = parser.get_root ().get_object ();
 
             base.from_json_object ((Json.Object)root_object.get_object_member ("project"), gitlab_instance_url);
@@ -184,5 +185,47 @@ namespace AlpineQaBot {
         public string source { get; private set; }
         public PipelineStatus status { get; private set; }
         public MergeRequest? merge_request { get; private set; }
+    }
+
+    public class MergeRequestJob : Job {
+        public MergeRequestJob (Project project, MergeRequest merge_request, string gitlab_instance_url) {
+            base (project, gitlab_instance_url);
+            this.merge_request = merge_request;
+        }
+
+        public MergeRequestJob.from_json (string json, string gitlab_instance_url) throws GLib.Error {
+            var parser = new Json.Parser ();
+            parser.load_from_data (json);
+            var root_object = parser.get_root ().get_object ();
+
+            base.from_json_object ((Json.Object)root_object.get_object_member ("project"), gitlab_instance_url);
+            this.merge_request = MergeRequest.from_json_object ((Json.Object)root_object.get_object_member ("object_attributes"));
+        }
+
+        public override bool process () {
+            if (this.merge_request.state == MergeRequestState.Opened) {
+                var rest_proxy = new Rest.Proxy ("%s/projects/%d/merge_requests/%d", true);
+                rest_proxy.bind (this.gitlab_instance_url, this.project.id, this._merge_request.iid);
+                var rest_proxy_call = rest_proxy.new_call ();
+                rest_proxy_call.add_param ("allow_collaboration", "true");
+
+                try {
+                    rest_proxy_call.run ();
+                } catch (GLib.Error e) {
+                    warning ("Failed to run REST API call: %s", e.message);
+                    return false;
+                }
+
+                if (rest_proxy_call.get_status_code () != 200) {
+                    warning ("Got HTTP status code %u back from gitlab", rest_proxy_call.get_status_code ());
+                    return false;
+                }
+            }
+
+
+            return true;
+        }
+
+        public MergeRequest merge_request { get; private set; }
     }
 }

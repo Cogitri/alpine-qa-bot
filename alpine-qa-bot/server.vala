@@ -39,6 +39,16 @@ namespace AlpineQaBot {
                     return;
                 }
                 break;
+            case "Merge Request Hook":
+                try {
+                    self.job_queue.push (new MergeRequestJob.from_json ((string) msg.request_body.data, self.gitlab_instance_url));
+                } catch (Error e) {
+                    warning ("Failed to add new job due to error %s", e.message);
+                    msg.set_response ("application/json", Soup.MemoryUse.COPY, "{'message': 'FAIL'}".data);
+                    msg.set_status (Soup.Status.INTERNAL_SERVER_ERROR);
+                    return;
+                }
+                break;
             default:
                 warning ("Received unknown event %s", msg.request_headers.get_one ("X-Gitlab-Event"));
                 break;

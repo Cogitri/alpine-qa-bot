@@ -4,7 +4,7 @@ lib_src = files(
     'worker.vala',
 )
 
-static_lib = shared_library(
+static_lib = static_library(
     'alpine-qa-bot-static-lib',
     lib_src,
     dependencies: deps,
@@ -23,4 +23,5 @@ executable(
     'alpine-qa-bot-server',
     files('main.vala'),
     dependencies: static_lib_dep,
+    install: true,
 )

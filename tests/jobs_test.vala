@@ -202,7 +202,7 @@ public void test_pipeline_job_from_json () {
    """;
 
     try {
-        var job = new AlpineQaBot.PipelineJob.from_json (test_json, "https://gitlab.com");
+        var job = new AlpineQaBot.PipelineJob.from_json (test_json, "https://gitlab.com", "token");
         assert (job != null);
         assert (job.source == "merge_request_event");
         assert (job.status == AlpineQaBot.PipelineStatus.Success);
@@ -362,7 +362,7 @@ void test_merge_request_job_from_json () {
    """;
 
     try {
-        var job = new AlpineQaBot.MergeRequestJob.from_json (test_json, "https://gitlab.com");
+        var job = new AlpineQaBot.MergeRequestJob.from_json (test_json, "https://gitlab.com", "token");
         assert (job != null);
         assert (job.merge_request.id == 99);
         assert (job.merge_request.iid == 1);

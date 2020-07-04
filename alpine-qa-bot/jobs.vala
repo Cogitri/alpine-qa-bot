@@ -73,25 +73,28 @@ namespace AlpineQaBot {
     }
 
     public abstract class Job : GLib.Object {
-        protected Job (Project? project, string? gitlab_instance_url) {
+        protected Job (Project? project, string? gitlab_instance_url, string? api_authentication_token) {
             this.project = project;
             this.gitlab_instance_url = gitlab_instance_url;
+            this.api_authentication_token = api_authentication_token;
         }
 
-        protected Job.from_json_object (Json.Object root_obj, string gitlab_instance_url) throws GLib.Error {
+        protected Job.from_json_object (Json.Object root_obj, string gitlab_instance_url, string? api_authentication_token) throws GLib.Error {
             this.project = Project (root_obj.get_int_member ("id"), root_obj.get_string_member ("name"));
             this.gitlab_instance_url = gitlab_instance_url;
+            this.api_authentication_token = api_authentication_token;
         }
 
         public abstract bool process();
 
+        public string? api_authentication_token { get; private set; }
         public string? gitlab_instance_url { get; private set; }
         public Project? project { get; private set; }
     }
 
     public class JobShutdown : Job {
         public JobShutdown () {
-            base (null, null);
+            base (null, null, null);
         }
 
         public override bool process () {
@@ -101,17 +104,17 @@ namespace AlpineQaBot {
     }
 
     public class PipelineJob : Job {
-        public PipelineJob (Project project, string source, string gitlab_instance_url) {
-            base (project, gitlab_instance_url);
+        public PipelineJob (Project project, string source, string gitlab_instance_url, string api_authentication_token) {
+            base (project, gitlab_instance_url, api_authentication_token);
             this.source = source;
         }
 
-        public PipelineJob.from_json (string json, string gitlab_instance_url) throws GLib.Error {
+        public PipelineJob.from_json (string json, string gitlab_instance_url, string api_authentication_token) throws GLib.Error {
             var parser = new Json.Parser ();
             parser.load_from_data (json);
             var root_object = parser.get_root ().get_object ();
 
-            base.from_json_object ((Json.Object)root_object.get_object_member ("project"), gitlab_instance_url);
+            base.from_json_object ((Json.Object)root_object.get_object_member ("project"), gitlab_instance_url, api_authentication_token);
 
             var merge_request_object = root_object.get_object_member ("merge_request");
             if (merge_request_object == null) {
@@ -155,25 +158,26 @@ namespace AlpineQaBot {
 
         public override bool process () {
             if ((this.status == PipelineStatus.Failed || this.status == PipelineStatus.Success) && this.merge_request != null) {
-                var rest_proxy = new Rest.Proxy ("%s/projects/%d/merge_requests/%d", true);
-                rest_proxy.bind (this.gitlab_instance_url, this.project.id, this._merge_request.iid);
-                var rest_proxy_call = rest_proxy.new_call ();
-
+                var soup_session = new Soup.Session ();
+                var query_url = "%s/api/v4/projects/%lld/merge_requests/%lld".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
+                info ("Querying URL %s", query_url);
+                var soup_msg = new Soup.Message ("PUT", query_url);
+                soup_msg.request_headers.append ("Private-Token", this.api_authentication_token);
                 if (this.status == PipelineStatus.Failed) {
-                    rest_proxy_call.add_param ("add_labels", "status:mr-build-broken");
+                    soup_msg.set_request ("application/json", Soup.MemoryUse.COPY, "{\"add_labels\": [\"status:mr-build-broken\"]}".data);
                 } else {
-                    rest_proxy_call.add_param ("remove_labels", "status:mr-build-broken");
+                    soup_msg.set_request ("application/json", Soup.MemoryUse.COPY, "{\"remove_labels\": [\"status:mr-build-broken\"]}".data);
                 }
 
                 try {
-                    rest_proxy_call.run ();
+                    soup_session.send (soup_msg);
                 } catch (GLib.Error e) {
                     warning ("Failed to run REST API call: %s", e.message);
                     return false;
                 }
 
-                if (rest_proxy_call.get_status_code () != 200) {
-                    warning ("Got HTTP status code %u back from gitlab", rest_proxy_call.get_status_code ());
+                if (soup_msg.status_code != 200) {
+                    warning ("Got HTTP status code %u back from gitlab. Response: %s", soup_msg.status_code, (string) soup_msg.response_body.data);
                     return false;
                 }
             }
@@ -188,36 +192,38 @@ namespace AlpineQaBot {
     }
 
     public class MergeRequestJob : Job {
-        public MergeRequestJob (Project project, MergeRequest merge_request, string gitlab_instance_url) {
-            base (project, gitlab_instance_url);
+        public MergeRequestJob (Project project, MergeRequest merge_request, string gitlab_instance_url, string api_authentication_token) {
+            base (project, gitlab_instance_url, api_authentication_token);
             this.merge_request = merge_request;
         }
 
-        public MergeRequestJob.from_json (string json, string gitlab_instance_url) throws GLib.Error {
+        public MergeRequestJob.from_json (string json, string gitlab_instance_url, string api_authentication_token) throws GLib.Error {
             var parser = new Json.Parser ();
             parser.load_from_data (json);
             var root_object = parser.get_root ().get_object ();
 
-            base.from_json_object ((Json.Object)root_object.get_object_member ("project"), gitlab_instance_url);
+            base.from_json_object ((Json.Object)root_object.get_object_member ("project"), gitlab_instance_url, api_authentication_token);
             this.merge_request = MergeRequest.from_json_object ((Json.Object)root_object.get_object_member ("object_attributes"));
         }
 
         public override bool process () {
             if (this.merge_request.state == MergeRequestState.Opened) {
-                var rest_proxy = new Rest.Proxy ("%s/projects/%d/merge_requests/%d", true);
-                rest_proxy.bind (this.gitlab_instance_url, this.project.id, this._merge_request.iid);
-                var rest_proxy_call = rest_proxy.new_call ();
-                rest_proxy_call.add_param ("allow_collaboration", "true");
+                var soup_session = new Soup.Session ();
+                var query_url = "%s/api/v4/projects/%lld/merge_requests/%lld".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
+                info ("Querying URL %s", query_url);
+                var soup_msg = new Soup.Message ("PUT", query_url);
+                soup_msg.request_headers.append ("Private-Token", this.api_authentication_token);
+                soup_msg.set_request ("application/json", Soup.MemoryUse.COPY, "{\"allow_collaboration\": true}".data);
 
                 try {
-                    rest_proxy_call.run ();
+                    soup_session.send (soup_msg);
                 } catch (GLib.Error e) {
                     warning ("Failed to run REST API call: %s", e.message);
                     return false;
                 }
 
-                if (rest_proxy_call.get_status_code () != 200) {
-                    warning ("Got HTTP status code %u back from gitlab", rest_proxy_call.get_status_code ());
+                if (soup_msg.status_code != 200) {
+                    warning ("Got HTTP status code %u back from gitlab. Response: %s", soup_msg.status_code, (string) soup_msg.response_body.data);
                     return false;
                 }
             }

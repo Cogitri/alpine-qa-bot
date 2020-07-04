@@ -16,10 +16,12 @@ public int main (string[] args) {
         error ("Failed to parse key file %s due to error '%s'", key_file_path, e.message);
     }
 
+    string authenication_token = null;
     string gitlab_instance_url = null;
     string gitlab_token = null;
     uint server_port = 0;
     try {
+        authenication_token = key_file.get_string ("Server", "AuthenticationToken");
         gitlab_instance_url = key_file.get_string ("Server", "GitlabUrl");
         gitlab_token = key_file.get_string ("Server", "GitlabToken");
         server_port = key_file.get_integer ("Server", "Port");
@@ -30,7 +32,7 @@ public int main (string[] args) {
     var loop = new MainLoop ();
     AlpineQaBot.WebHookEventListenerServer ev = null;
     try {
-        ev = new AlpineQaBot.WebHookEventListenerServer (gitlab_instance_url, gitlab_token, server_port);
+        ev = new AlpineQaBot.WebHookEventListenerServer (gitlab_instance_url, gitlab_token, authenication_token, server_port);
     } catch (Error e) {
         error ("Failed to listen on port %u due to error %s", server_port, e.message);
     }

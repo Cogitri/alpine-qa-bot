@@ -5,10 +5,11 @@
  */
 namespace AlpineQaBot {
     public class WebHookEventListenerServer : Soup.Server {
-        public WebHookEventListenerServer (string gitlab_instance_url, string gitlab_token, uint server_listen_port) throws GLib.Error {
+        public WebHookEventListenerServer (string gitlab_instance_url, string gitlab_token, string api_authentication_token, uint server_listen_port) throws GLib.Error {
             Object (port: 8088);
             assert (this != null);
 
+            this.api_authentication_token = api_authentication_token;
             this.gitlab_instance_url = gitlab_instance_url;
             this.gitlab_token = gitlab_token;
             this.job_queue = new AsyncQueue<AlpineQaBot.Job>();
@@ -31,7 +32,7 @@ namespace AlpineQaBot {
             switch (msg.request_headers.get_one ("X-Gitlab-Event")) {
             case "Pipeline Hook":
                 try {
-                    self.job_queue.push (new PipelineJob.from_json ((string) msg.request_body.data, self.gitlab_instance_url));
+                    self.job_queue.push (new PipelineJob.from_json ((string) msg.request_body.data, self.gitlab_instance_url, self.api_authentication_token));
                 } catch (Error e) {
                     warning ("Failed to add new job due to error %s", e.message);
                     msg.set_response ("application/json", Soup.MemoryUse.COPY, "{'message': 'FAIL'}".data);
@@ -41,7 +42,7 @@ namespace AlpineQaBot {
                 break;
             case "Merge Request Hook":
                 try {
-                    self.job_queue.push (new MergeRequestJob.from_json ((string) msg.request_body.data, self.gitlab_instance_url));
+                    self.job_queue.push (new MergeRequestJob.from_json ((string) msg.request_body.data, self.gitlab_instance_url, self.api_authentication_token));
                 } catch (Error e) {
                     warning ("Failed to add new job due to error %s", e.message);
                     msg.set_response ("application/json", Soup.MemoryUse.COPY, "{'message': 'FAIL'}".data);
@@ -67,6 +68,7 @@ namespace AlpineQaBot {
             msg.set_status (Soup.Status.OK);
         }
 
+        private string api_authentication_token { private get; private set; }
         private string gitlab_token { private get; private set; }
         private string gitlab_instance_url { private get; private set; }
         public AsyncQueue<AlpineQaBot.Job> job_queue { get; private set; }

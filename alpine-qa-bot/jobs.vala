@@ -238,7 +238,9 @@ namespace AlpineQaBot {
                 info ("Querying URL %s", query_url);
                 var soup_msg = new Soup.Message ("PUT", query_url);
                 soup_msg.request_headers.append ("Private-Token", this.api_authentication_token);
-                soup_msg.set_request ("application/json", Soup.MemoryUse.COPY, "{\"allow_collaboration\": true}".data);
+                // FIXME: Gitlab API doesn't know allow_collaboration is a valid parameter and wants us to specify at least one valid param,
+                // so we just specify an empty add_labels here.
+                soup_msg.set_request ("application/json", Soup.MemoryUse.COPY, "{\"add_labels\": null,\"allow_collaboration\": true}".data);
 
                 try {
                     soup_session.send (soup_msg);

@@ -369,6 +369,7 @@ void test_merge_request_job_from_json () {
         assert (job.merge_request.state == AlpineQaBot.MergeRequestState.Opened);
         assert (job.merge_request.target_branch == "master");
         assert (job.merge_request.target_project_id == 14);
+        assert (job.merge_request.action == AlpineQaBot.MergeRequestAction.Open);
     } catch (Error e) {
         assert (false);
     }

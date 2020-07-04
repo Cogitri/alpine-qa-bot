@@ -11,6 +11,13 @@ namespace AlpineQaBot {
         Opened,
     }
 
+    public enum MergeRequestAction {
+        Close,
+        Create,
+        Open,
+        Update,
+    }
+
     public enum PipelineStatus {
         Canceled,
         Created,
@@ -33,7 +40,8 @@ namespace AlpineQaBot {
     }
 
     public struct MergeRequest {
-        public MergeRequest (int64 id, int64 iid, MergeRequestState state, string target_branch, int64 target_project_id) {
+        public MergeRequest (MergeRequestAction action, int64 id, int64 iid, MergeRequestState state, string target_branch, int64 target_project_id) {
+            this.action = action;
             this.id = id;
             this.iid = iid;
             this.state = state;
@@ -63,8 +71,28 @@ namespace AlpineQaBot {
             default:
                 error ("Unknown merge request state %s", root_obj.get_string_member ("state"));
             }
+
+            if (root_obj.has_member ("action")) {
+                switch (root_obj.get_string_member ("action")) {
+                case "close":
+                    this.action = MergeRequestAction.Close;
+                    break;
+                case "create":
+                    this.action = MergeRequestAction.Create;
+                    break;
+                case "open":
+                    this.action = MergeRequestAction.Open;
+                    break;
+                case "update":
+                    this.action = MergeRequestAction.Update;
+                    break;
+                default:
+                    error ("Unknown merge request action %s", root_obj.get_string_member ("action"));
+                }
+            }
         }
 
+        public MergeRequestAction? action { get; private set; }
         public int64 id { get; private set; }
         public int64 iid { get; private set; }
         public MergeRequestState state { get; private set; }
@@ -116,11 +144,8 @@ namespace AlpineQaBot {
 
             base.from_json_object ((Json.Object)root_object.get_object_member ("project"), gitlab_instance_url, api_authentication_token);
 
-            var merge_request_object = root_object.get_object_member ("merge_request");
-            if (merge_request_object == null) {
-                this.merge_request = null;
-            } else {
-                this.merge_request = MergeRequest.from_json_object ((Json.Object)merge_request_object);
+            if (root_object.has_member ("merge_request")) {
+                this.merge_request = MergeRequest.from_json_object ((Json.Object)root_object.get_object_member ("merge_request"));
             }
 
             this.source = root_object.get_object_member ("object_attributes").get_string_member ("source");
@@ -207,7 +232,7 @@ namespace AlpineQaBot {
         }
 
         public override bool process () {
-            if (this.merge_request.state == MergeRequestState.Opened) {
+            if (this.merge_request.state == MergeRequestState.Opened && this.merge_request.action == MergeRequestAction.Open) {
                 var soup_session = new Soup.Session ();
                 var query_url = "%s/api/v4/projects/%lld/merge_requests/%lld".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
                 info ("Querying URL %s", query_url);

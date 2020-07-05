@@ -1,0 +1,42 @@
+> PUT /api/v4/projects/19765543/merge_requests/20 HTTP/1.1
+> Soup-Debug-Timestamp: 1593981795
+> Soup-Debug: SoupSession 1 (0x55a44048d220), SoupMessage 1 (0x55a440487670), SoupSocket 1 (0x55a440479e70)
+> Host: gitlab.com
+> Private-Token: bF2YvsEN6T54EsFRNmD1
+> Content-Type: application/json
+> Accept-Encoding: gzip, deflate
+> Connection: Keep-Alive
+> 
+> {"add_labels": null,"allow_collaboration": true}
+  
+< HTTP/1.1 200 OK
+< Soup-Debug-Timestamp: 1593981796
+< Soup-Debug: SoupMessage 1 (0x55a440487670)
+< Date: Sun, 05 Jul 2020 20:43:16 GMT
+< Content-Type: application/json
+< Transfer-Encoding: chunked
+< Connection: keep-alive
+< Set-Cookie: __cfduid=df8a4ac0851c8a6948cc52fd9be52f2b41593981795; expires=Tue, 04-Aug-20 20:43:15 GMT; path=/; domain=.gitlab.com; HttpOnly; SameSite=Lax; Secure
+< Cache-Control: max-age=0, private, must-revalidate
+< Etag: W/"94e2c25158f1b583e8dd937c3bef923e"
+< Vary: Origin
+< X-Content-Type-Options: nosniff
+< X-Frame-Options: SAMEORIGIN
+< X-Request-Id: AcBU5RggEC1
+< X-Runtime: 0.169788
+< Strict-Transport-Security: max-age=31536000
+< Referrer-Policy: strict-origin-when-cross-origin
+< RateLimit-Limit: 600
+< RateLimit-Observed: 1
+< RateLimit-Remaining: 599
+< RateLimit-Reset: 1593981856
+< RateLimit-ResetTime: Sun, 05 Jul 2020 20:44:16 GMT
+< GitLab-LB: fe-07-lb-gprd
+< GitLab-SV: localhost
+< CF-Cache-Status: DYNAMIC
+< cf-request-id: 03c25115270000c49f8024b200000001
+< Expect-CT: max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+< Server: cloudflare
+< CF-RAY: 5ae3eaceacedc49f-DUS
+< Content-Encoding: gzip
+  

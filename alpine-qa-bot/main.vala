@@ -36,7 +36,7 @@ public int main (string[] args) {
     } catch (Error e) {
         error ("Failed to listen on port %u due to error %s", server_port, e.message);
     }
-    new AlpineQaBot.Worker (ev.job_queue);
+    new AlpineQaBot.Worker (ev.job_queue, loop);
     loop.run ();
     return 0;
 }

@@ -1,0 +1,17 @@
+> PUT /triage/system-hooks HTTP/1.1
+> Soup-Debug-Timestamp: 1593979876
+> Soup-Debug: SoupSession 1 (0x5627aa942100), SoupMessage 1 (0x5627aa93d8d0), SoupSocket 1 (0x5627aa92fb30)
+> Host: localhost:8012
+> X-Gitlab-Token: INVALID_TOKEN
+> Accept-Encoding: gzip, deflate
+> Connection: Keep-Alive
+  
+< HTTP/1.1 403 Forbidden
+< Soup-Debug-Timestamp: 1593979876
+< Soup-Debug: SoupMessage 1 (0x5627aa93d8d0)
+< Date: Sun, 05 Jul 2020 20:11:16 GMT
+< Content-Type: application/json
+< Content-Length: 19
+< 
+< {'message': 'FAIL'}
+  

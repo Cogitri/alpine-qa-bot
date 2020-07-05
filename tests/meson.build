@@ -1,7 +1,19 @@
+test_lib = static_library(
+    'alpine-qa-bot-test-lib',
+    files('test_lib.vala'),
+    dependencies: test_deps,
+)
+
+test_lib_dep = declare_dependency(
+    link_with: test_lib,
+    dependencies: test_deps,
+    include_directories: include_directories('.'),
+)
+
 jobs_test_exe = executable(
-    'jobs_test',
+    'alpine-qa-bot-jobs-test',
     files('jobs_test.vala'),
-    dependencies: [static_lib_dep, test_deps]
+    dependencies: [static_lib_dep, test_lib_dep]
 )
 
 custom_target(
@@ -14,5 +26,17 @@ custom_target(
 test(
     'Jobs Test',
     jobs_test_exe,
+    env: ['G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()), 'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir())],
+)
+
+server_test_exe = executable(
+    'alpine-qa-bot-server-test',
+    files('server_test.vala'),
+    dependencies: [static_lib_dep, test_lib_dep],
+)
+
+test(
+    'server-test',
+    server_test_exe,
     env: ['G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()), 'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir())],
 )

@@ -12,7 +12,6 @@ namespace AlpineQaBot {
             this.api_authentication_token = api_authentication_token;
             this.gitlab_instance_url = gitlab_instance_url;
             this.gitlab_token = gitlab_token;
-            this.job_queue = new AsyncQueue<AlpineQaBot.Job>();
             this.add_handler ("/triage/system-hooks", gitlab_post_handler);
             this.add_handler (null, default_handler);
             this.listen_all (server_listen_port, Soup.ServerListenOptions.IPV4_ONLY);
@@ -32,7 +31,7 @@ namespace AlpineQaBot {
             switch (msg.request_headers.get_one ("X-Gitlab-Event")) {
             case "Pipeline Hook":
                 try {
-                    self.job_queue.push (new PipelineJob.from_json ((string) msg.request_body.data, self.gitlab_instance_url, self.api_authentication_token));
+                    self.job_received (new PipelineJob.from_json ((string) msg.request_body.data, self.gitlab_instance_url, self.api_authentication_token));
                 } catch (Error e) {
                     warning ("Failed to add new job due to error %s", e.message);
                     msg.set_response ("application/json", Soup.MemoryUse.COPY, "{'message': 'FAIL'}".data);
@@ -42,7 +41,7 @@ namespace AlpineQaBot {
                 break;
             case "Merge Request Hook":
                 try {
-                    self.job_queue.push (new MergeRequestJob.from_json ((string) msg.request_body.data, self.gitlab_instance_url, self.api_authentication_token));
+                    self.job_received (new MergeRequestJob.from_json ((string) msg.request_body.data, self.gitlab_instance_url, self.api_authentication_token));
                 } catch (Error e) {
                     warning ("Failed to add new job due to error %s", e.message);
                     msg.set_response ("application/json", Soup.MemoryUse.COPY, "{'message': 'FAIL'}".data);
@@ -71,6 +70,7 @@ namespace AlpineQaBot {
         private string api_authentication_token { private get; private set; }
         private string gitlab_token { private get; private set; }
         private string gitlab_instance_url { private get; private set; }
-        public AsyncQueue<AlpineQaBot.Job> job_queue { get; private set; }
+        public signal void job_received(Job received_job);
+
     }
 }

@@ -1,7 +1,6 @@
 lib_src = files(
     'jobs.vala',
     'server.vala',
-    'worker.vala',
 )
 
 static_lib = static_library(

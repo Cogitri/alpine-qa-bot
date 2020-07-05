@@ -86,10 +86,15 @@ void test_server_merge_request_job_process () {
     req_soup_session.queue_message (soup_message, (session, msg) => {
         assert ((string) msg.response_body.data == "{'message': 'OK'}");
         assert (msg.status_code == 200);
-        ev.job_queue.push (new AlpineQaBot.JobShutdown ());
+        ev.job_received (new AlpineQaBot.JobShutdown ());
     });
 
-    new AlpineQaBot.Worker (ev.job_queue, loop, TestLib.get_test_soup_session (mock_server));
+    ev.job_received.connect ((job) => {
+        if (job is AlpineQaBot.JobShutdown) {
+            loop.quit ();
+        }
+        job.process (TestLib.get_test_soup_session (mock_server));
+    });
     loop.run ();
 
     mock_server.end_trace ();

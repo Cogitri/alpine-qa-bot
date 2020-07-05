@@ -187,6 +187,7 @@ namespace AlpineQaBot {
                 var query_url = "%s/api/v4/projects/%lld/merge_requests/%lld".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
                 info ("Querying URL %s", query_url);
                 var soup_msg = new Soup.Message ("PUT", query_url);
+                assert_nonnull (soup_msg);
                 soup_msg.request_headers.append ("Private-Token", this.api_authentication_token);
                 if (this.status == PipelineStatus.Failed) {
                     soup_msg.set_request ("application/json", Soup.MemoryUse.COPY, "{\"add_labels\": [\"status:mr-build-broken\"]}".data);
@@ -237,6 +238,7 @@ namespace AlpineQaBot {
                 var query_url = "%s/api/v4/projects/%lld/merge_requests/%lld".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
                 info ("Querying URL %s", query_url);
                 var soup_msg = new Soup.Message ("PUT", query_url);
+                assert_nonnull (soup_msg);
                 soup_msg.request_headers.append ("Private-Token", this.api_authentication_token);
                 // FIXME: Gitlab API doesn't know allow_collaboration is a valid parameter and wants us to specify at least one valid param,
                 // so we just specify an empty add_labels here.

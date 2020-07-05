@@ -142,10 +142,10 @@ namespace AlpineQaBot {
             parser.load_from_data (json);
             var root_object = parser.get_root ().get_object ();
 
-            base.from_json_object ((Json.Object)root_object.get_object_member ("project"), gitlab_instance_url, api_authentication_token);
+            base.from_json_object ((!)root_object.get_object_member ("project"), gitlab_instance_url, api_authentication_token);
 
             if (root_object.has_member ("merge_request")) {
-                this.merge_request = MergeRequest.from_json_object ((Json.Object)root_object.get_object_member ("merge_request"));
+                this.merge_request = MergeRequest.from_json_object ((!)root_object.get_object_member ("merge_request"));
             }
 
             this.source = root_object.get_object_member ("object_attributes").get_string_member ("source");
@@ -228,8 +228,8 @@ namespace AlpineQaBot {
             parser.load_from_data (json);
             var root_object = parser.get_root ().get_object ();
 
-            base.from_json_object ((Json.Object)root_object.get_object_member ("project"), gitlab_instance_url, api_authentication_token);
-            this.merge_request = MergeRequest.from_json_object ((Json.Object)root_object.get_object_member ("object_attributes"));
+            base.from_json_object ((!)root_object.get_object_member ("project"), gitlab_instance_url, api_authentication_token);
+            this.merge_request = MergeRequest.from_json_object ((!)root_object.get_object_member ("object_attributes"));
         }
 
         public override bool process (Soup.Session? default_soup_session = null) {

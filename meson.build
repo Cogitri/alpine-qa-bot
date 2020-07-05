@@ -13,6 +13,10 @@ deps = [
     dependency('json-glib-1.0'),
 ]
 
+test_deps = [
+    dependency('libuhttpmock-0.0')
+]
+
 # Add our config VAPI
 add_project_arguments(
   [

@@ -113,7 +113,7 @@ namespace AlpineQaBot {
             this.api_authentication_token = api_authentication_token;
         }
 
-        public abstract bool process();
+        public abstract bool process(Soup.Session? default_soup_session = null);
 
         public string? api_authentication_token { get; private set; }
         public string? gitlab_instance_url { get; private set; }
@@ -125,7 +125,7 @@ namespace AlpineQaBot {
             base (null, null, null);
         }
 
-        public override bool process () {
+        public override bool process (Soup.Session? default_soup_session = null) {
             return true;
         }
 
@@ -181,9 +181,9 @@ namespace AlpineQaBot {
             }
         }
 
-        public override bool process () {
+        public override bool process (Soup.Session? default_soup_session = null) {
             if ((this.status == PipelineStatus.Failed || this.status == PipelineStatus.Success) && this.merge_request != null) {
-                var soup_session = new Soup.Session ();
+                var soup_session = default_soup_session ?? new Soup.Session ();
                 var query_url = "%s/api/v4/projects/%lld/merge_requests/%lld".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
                 info ("Querying URL %s", query_url);
                 var soup_msg = new Soup.Message ("PUT", query_url);
@@ -231,9 +231,9 @@ namespace AlpineQaBot {
             this.merge_request = MergeRequest.from_json_object ((Json.Object)root_object.get_object_member ("object_attributes"));
         }
 
-        public override bool process () {
+        public override bool process (Soup.Session? default_soup_session = null) {
             if (this.merge_request.state == MergeRequestState.Opened && this.merge_request.action == MergeRequestAction.Open) {
-                var soup_session = new Soup.Session ();
+                var soup_session = default_soup_session ?? new Soup.Session ();
                 var query_url = "%s/api/v4/projects/%lld/merge_requests/%lld".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
                 info ("Querying URL %s", query_url);
                 var soup_msg = new Soup.Message ("PUT", query_url);

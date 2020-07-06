@@ -6,7 +6,7 @@
 namespace AlpineQaBot {
     public class WebHookEventListenerServer : Soup.Server {
         public WebHookEventListenerServer (string gitlab_instance_url, string gitlab_token, string api_authentication_token, uint server_listen_port) throws GLib.Error {
-            Object (port: 8088);
+            Object ();
             assert (this != null);
 
             this.api_authentication_token = api_authentication_token;

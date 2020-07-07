@@ -72,7 +72,7 @@ namespace AlpineQaBot {
                 error ("Unknown merge request state %s", root_obj.get_string_member ("state"));
             }
 
-            if (root_obj.has_member ("action")) {
+            if (root_obj.has_member ("action") && !root_obj.get_null_member ("action")) {
                 switch (root_obj.get_string_member ("action")) {
                 case "close":
                     this.action = MergeRequestAction.Close;
@@ -144,7 +144,7 @@ namespace AlpineQaBot {
 
             base.from_json_object ((!)root_object.get_object_member ("project"), gitlab_instance_url, api_authentication_token);
 
-            if (root_object.has_member ("merge_request")) {
+            if (root_object.has_member ("merge_request") && !root_object.get_null_member ("merge_request")) {
                 this.merge_request = MergeRequest.from_json_object ((!)root_object.get_object_member ("merge_request"));
             }
 

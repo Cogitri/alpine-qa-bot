@@ -11,10 +11,17 @@ test:
     - meson build && ninja -C build test
 
 coverage:
+  image: ubuntu:focal
   stage: test
   before_script:
-    - apk add meson vala glib-dev libsoup-dev json-glib-dev uhttpmock-dev alpine-sdk openssl bash
+    - apt update
+    - env DEBIAN_FRONTEND=noninteractive apt install -fy valac libsoup2.4-dev libglib2.0-dev libjson-glib-dev openssl meson build-essential gcovr curl libgirepository1.0-dev
+    - curl -L -O https://tecnocode.co.uk/downloads/uhttpmock/uhttpmock-0.5.2.tar.xz && tar xf uhttpmock-0.5.2.tar.xz && cd uhttpmock-0.5.2
+    - curl -L https://gitlab.alpinelinux.org/alpine/aports/-/raw//13129b99661d439847296d2609e361ccda81e0b4/community/uhttpmock/only-listen-on-ipv4.patch | patch -p1
+    - ./configure --enable-vala --enable-introspection && make && make install
+    - cd ..
   script:
-    - meson -D b_coverage=true build && ninja -C build test
+    - meson -D b_coverage=true build && env LD_LIBRARY_PATH=/usr/local/lib ninja -C build test && ninja -C build coverage-text
   after_script:
+    - cat build/meson-logs/coverage.txt
     - curl -s https://codecov.io/bash | bash

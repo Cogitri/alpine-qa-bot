@@ -9,3 +9,12 @@ test:
     - apk add meson vala glib-dev libsoup-dev json-glib-dev uhttpmock-dev alpine-sdk openssl
   script:
     - meson build && ninja -C build test
+
+coverage:
+  stage: test
+  before_script:
+    - apk add meson vala glib-dev libsoup-dev json-glib-dev uhttpmock-dev alpine-sdk openssl bash
+  script:
+    - meson -D b_coverage=true build && ninja -C build test
+  after_script:
+    - curl -s https://codecov.io/bash | bash

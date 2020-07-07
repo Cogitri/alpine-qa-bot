@@ -9,6 +9,8 @@ namespace AlpineQaBot {
             Object ();
             assert (this != null);
 
+            info ("Starting server, listening on port %u", server_listen_port);
+
             this.api_authentication_token = api_authentication_token;
             this.gitlab_instance_url = gitlab_instance_url;
             this.gitlab_token = gitlab_token;
@@ -19,16 +21,20 @@ namespace AlpineQaBot {
         }
 
         private static void gitlab_post_handler (Soup.Server server, Soup.Message msg, string path, GLib.HashTable ? query, Soup.ClientContext client) {
+            debug ("Receiving webhook notification from gitlab with contents '%s'", (string) msg.request_body.data);
+
             var self = server as WebHookEventListenerServer;
             assert (self != null);
 
             if (msg.request_headers.get_one ("X-Gitlab-Token") != self.gitlab_token) {
                 msg.set_status (Soup.Status.FORBIDDEN);
                 msg.set_response ("application/json", Soup.MemoryUse.COPY, "{'message': 'FAIL'}".data);
+                warning ("Received message with invalid Gitlab-Token: Expected value set in config, got %s", msg.request_headers.get_one ("X-Gitlab-Token"));
                 return;
             }
 
-            switch (msg.request_headers.get_one ("X-Gitlab-Event")) {
+            var event = msg.request_headers.get_one ("X-Gitlab-Event");
+            switch (event) {
             case "Pipeline Hook":
                 try {
                     self.job_received (new PipelineJob.from_json ((string) msg.request_body.data, self.gitlab_instance_url, self.api_authentication_token));
@@ -50,15 +56,18 @@ namespace AlpineQaBot {
                 }
                 break;
             default:
-                warning ("Received unknown event %s", msg.request_headers.get_one ("X-Gitlab-Event"));
+                warning ("Received unknown event %s", event);
                 break;
             }
 
+            debug ("Sucessfully processed event %s", event);
             msg.set_response ("application/json", Soup.MemoryUse.COPY, "{'message': 'OK'}".data);
             msg.set_status (Soup.Status.OK);
         }
 
         private static void default_handler (Soup.Server server, Soup.Message msg, string path, GLib.HashTable ? query, Soup.ClientContext client) {
+            debug ("Serving default page");
+
             var self = server as WebHookEventListenerServer;
             assert (self != null);
             string html_head = "<head><title>Gitlab-Bot status page</title></head>";

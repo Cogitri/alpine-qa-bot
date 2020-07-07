@@ -183,6 +183,8 @@ namespace AlpineQaBot {
 
         public override bool process (Soup.Session? default_soup_session = null) {
             if ((this.status == PipelineStatus.Failed || this.status == PipelineStatus.Success) && this.merge_request != null) {
+                debug ("Querying Gitlab to add/remove status:mr-build-broken label to successfull/failing MR");
+
                 var soup_session = default_soup_session ?? new Soup.Session ();
                 var query_url = "%s/api/v4/projects/%lld/merge_requests/%lld".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
                 info ("Querying URL %s", query_url);
@@ -234,6 +236,8 @@ namespace AlpineQaBot {
 
         public override bool process (Soup.Session? default_soup_session = null) {
             if (this.merge_request.state == MergeRequestState.Opened && this.merge_request.action == MergeRequestAction.Open) {
+                debug ("Querying Gitlab to allow commit from maintainers for MR %lld", this.merge_request.iid);
+
                 var soup_session = default_soup_session ?? new Soup.Session ();
                 var query_url = "%s/api/v4/projects/%lld/merge_requests/%lld".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
                 info ("Querying URL %s", query_url);

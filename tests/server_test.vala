@@ -46,7 +46,11 @@ void test_server_invalid_token_access_denied () {
         loop.quit ();
     });
 
+    Test.expect_message (null, LogLevelFlags.LEVEL_WARNING, "*Received message with invalid Gitlab-Token: Expected value set in config, got INVALID_TOKEN");
+
     loop.run ();
+
+    Test.assert_expected_messages ();
 
     mock_server.end_trace ();
 }

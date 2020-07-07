@@ -37,6 +37,7 @@ public int main (string[] args) {
         error ("Failed to listen on port %u due to error %s", server_port, e.message);
     }
     ev.job_received.connect ((job) => {
+        debug ("Processing job %s", job.get_type ().to_string ());
         if (job is AlpineQaBot.JobShutdown) {
             loop.quit ();
         }

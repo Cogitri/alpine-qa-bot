@@ -154,6 +154,39 @@ namespace AlpineQaBot {
         public string suggestion { get; private set; }
     }
 
+    public class RequestSender : GLib.Object {
+        public RequestSender (string query_url, string http_method, string api_authentication_token, uint8[]? data, Soup.Session? default_soup_session) {
+            this.soup_session = default_soup_session ?? new Soup.Session ();
+            this.soup_message = new Soup.Message (http_method, query_url);
+
+            info ("Querying URL %s", query_url);
+            assert_nonnull (soup_message);
+            soup_message.request_headers.append ("Private-Token", api_authentication_token);
+            if (data != null) {
+                soup_message.set_request ("application/json", Soup.MemoryUse.COPY, data);
+            }
+        }
+
+        public bool send () {
+            try {
+                soup_session.send (this.soup_message);
+            } catch (GLib.Error e) {
+                warning ("Failed to run REST API call: %s", e.message);
+                return false;
+            }
+
+            if (this.soup_message.status_code != 200) {
+                warning ("Got HTTP status code %u back from gitlab. Response: %s", this.soup_message.status_code, (string) this.soup_message.response_body.data);
+                return false;
+            }
+
+            return true;
+        }
+
+        private Soup.Session soup_session;
+        private Soup.Message soup_message;
+    }
+
     public abstract class Job : GLib.Object {
         protected Job (Project? project, string? gitlab_instance_url, string? api_authentication_token) {
             this.project = project;
@@ -239,27 +272,18 @@ namespace AlpineQaBot {
             if ((this.status == PipelineStatus.Failed || this.status == PipelineStatus.Success) && this.merge_request != null) {
                 debug ("Querying Gitlab to add/remove status:mr-build-broken label to successfull/failing MR");
 
-                var soup_session = default_soup_session ?? new Soup.Session ();
                 var query_url = "%s/api/v4/projects/%lld/merge_requests/%lld".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
-                info ("Querying URL %s", query_url);
-                var soup_msg = new Soup.Message ("PUT", query_url);
-                assert_nonnull (soup_msg);
-                soup_msg.request_headers.append ("Private-Token", this.api_authentication_token);
+
+                string message = null;
                 if (this.status == PipelineStatus.Failed) {
-                    soup_msg.set_request ("application/json", Soup.MemoryUse.COPY, "{\"add_labels\": [\"status:mr-build-broken\"]}".data);
+                    message = "{\"add_labels\": [\"status:mr-build-broken\"]}";
                 } else {
-                    soup_msg.set_request ("application/json", Soup.MemoryUse.COPY, "{\"remove_labels\": [\"status:mr-build-broken\"]}".data);
+                    message = "{\"remove_labels\": [\"status:mr-build-broken\"]}";
                 }
 
-                try {
-                    soup_session.send (soup_msg);
-                } catch (GLib.Error e) {
-                    warning ("Failed to run REST API call: %s", e.message);
-                    return false;
-                }
+                var request_sender = new RequestSender (query_url, "PUT", this.api_authentication_token, message.data, default_soup_session);
 
-                if (soup_msg.status_code != 200) {
-                    warning ("Got HTTP status code %u back from gitlab. Response: %s", soup_msg.status_code, (string) soup_msg.response_body.data);
+                if (!request_sender.send ()) {
                     return false;
                 }
             }
@@ -297,23 +321,11 @@ namespace AlpineQaBot {
             }
 
             if (commit_message_suggestion != null) {
-                var soup_session = default_soup_session ?? new Soup.Session ();
+                debug ("Querying Gitlab to suggest better commit message for MR %lld", this.merge_request.iid);
+
                 var query_url = "%s/api/v4/projects/%lld/merge_requests/%lld/notes".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
-                info ("Querying URL %s", query_url);
-                var soup_msg = new Soup.Message ("POST", query_url);
-                assert_nonnull (soup_msg);
-                soup_msg.request_headers.append ("Private-Token", this.api_authentication_token);
-                soup_msg.set_request ("application/json", Soup.MemoryUse.COPY, @"{\"body\": \"$commit_message_suggestion\"}".data);
-
-                try {
-                    soup_session.send (soup_msg);
-                } catch (GLib.Error e) {
-                    warning ("Failed to run REST API call: %s", e.message);
-                    return false;
-                }
-
-                if (soup_msg.status_code != 200) {
-                    warning ("Got HTTP status code %u back from gitlab. Response: %s", soup_msg.status_code, (string) soup_msg.response_body.data);
+                var request_sender = new RequestSender (query_url, "POST", this.api_authentication_token, @"{\"body\": \"$commit_message_suggestion\"}".data, default_soup_session);
+                if (!request_sender.send ()) {
                     return false;
                 }
             }
@@ -321,25 +333,11 @@ namespace AlpineQaBot {
             if (this.merge_request.state == MergeRequestState.Opened && this.merge_request.action == MergeRequestAction.Open) {
                 debug ("Querying Gitlab to allow commit from maintainers for MR %lld", this.merge_request.iid);
 
-                var soup_session = default_soup_session ?? new Soup.Session ();
                 var query_url = "%s/api/v4/projects/%lld/merge_requests/%lld".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
-                info ("Querying URL %s", query_url);
-                var soup_msg = new Soup.Message ("PUT", query_url);
-                assert_nonnull (soup_msg);
-                soup_msg.request_headers.append ("Private-Token", this.api_authentication_token);
                 // FIXME: Gitlab API doesn't know allow_collaboration is a valid parameter and wants us to specify at least one valid param,
                 // so we just specify an empty add_labels here.
-                soup_msg.set_request ("application/json", Soup.MemoryUse.COPY, "{\"add_labels\": null,\"allow_collaboration\": true}".data);
-
-                try {
-                    soup_session.send (soup_msg);
-                } catch (GLib.Error e) {
-                    warning ("Failed to run REST API call: %s", e.message);
-                    return false;
-                }
-
-                if (soup_msg.status_code != 200) {
-                    warning ("Got HTTP status code %u back from gitlab. Response: %s", soup_msg.status_code, (string) soup_msg.response_body.data);
+                var request_sender = new RequestSender (query_url, "PUT", this.api_authentication_token, "{\"add_labels\": null,\"allow_collaboration\": true}".data, default_soup_session);
+                if (!request_sender.send ()) {
                     return false;
                 }
             }

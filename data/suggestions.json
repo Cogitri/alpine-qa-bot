@@ -1,0 +1,10 @@
+{
+    "commit": [
+        {
+            "offenders": [
+                ".*\/.*: update to.*"
+            ],
+            "suggestion": "$repository/$pkgname: upgrade to $pkgver"
+        }
+    ]
+}

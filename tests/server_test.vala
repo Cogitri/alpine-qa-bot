@@ -99,7 +99,12 @@ void test_server_merge_request_job_process () {
         }
         job.process (TestLib.get_test_soup_session (mock_server));
     });
+
+    Test.expect_message (null, GLib.LogLevelFlags.LEVEL_WARNING, "*Failed to get a suggestion for an alternative commit message due to error Failed to open file*");
+
     loop.run ();
+
+    Test.assert_expected_messages ();
 
     mock_server.end_trace ();
 }

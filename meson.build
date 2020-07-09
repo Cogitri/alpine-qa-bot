@@ -11,6 +11,7 @@ deps = [
     dependency('libsoup-2.4', version: '>=2.46'),
     dependency('threads'),
     dependency('json-glib-1.0'),
+    dependency('gee-0.8'),
 ]
 
 test_deps = [

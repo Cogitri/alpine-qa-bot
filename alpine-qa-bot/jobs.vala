@@ -90,14 +90,68 @@ namespace AlpineQaBot {
                     error ("Unknown merge request action %s", root_obj.get_string_member ("action"));
                 }
             }
+
+            if (root_obj.has_member ("last_commit") && !root_obj.get_null_member ("last_commit")) {
+                this.commit = Commit.from_json_object ((!)root_obj.get_object_member ("last_commit"));
+            }
         }
 
         public MergeRequestAction? action { get; private set; }
+        public Commit? commit { get; private set; }
         public int64 id { get; private set; }
         public int64 iid { get; private set; }
         public MergeRequestState state { get; private set; }
         public string target_branch { get; private set; }
         public int64 target_project_id { get; private set; }
+    }
+
+    public struct Commit {
+        public Commit (string id, string message) {
+            this.id = id;
+            this.message = message;
+        }
+
+        public Commit.from_json_object (Json.Object root_obj) {
+            this.id = root_obj.get_string_member ("id");
+            this.message = root_obj.get_string_member ("message");
+        }
+
+        public string id { get; private set; }
+        public string message { get; private set; }
+    }
+
+    public struct CommitSuggestion {
+        public CommitSuggestion (Gee.ArrayList<string> offenders, string suggestion) {
+            this.offenders = offenders;
+            this.suggestion = suggestion;
+        }
+
+        public CommitSuggestion.from_json_object (Json.Object root_obj) {
+            this.offenders = new Gee.ArrayList<string>();
+            var offenders_arr = root_obj.get_array_member ("offenders").get_elements ();
+            foreach (var offenders_element in offenders_arr) {
+                this.offenders.add (offenders_element.get_string ());
+            }
+            this.suggestion = root_obj.get_string_member ("suggestion");
+        }
+
+        public string? match (string commit_message) {
+            foreach (var offender in this.offenders) {
+                try {
+                    var regex = new GLib.Regex (offender);
+                    if (regex.match (commit_message)) {
+                        return this.suggestion;
+                    }
+                } catch (GLib.RegexError e) {
+                    warning ("Failed to compile Regex due to error %s", e.message);
+                }
+            }
+
+            return null;
+        }
+
+        public Gee.ArrayList<string> offenders;
+        public string suggestion { get; private set; }
     }
 
     public abstract class Job : GLib.Object {
@@ -235,6 +289,35 @@ namespace AlpineQaBot {
         }
 
         public override bool process (Soup.Session? default_soup_session = null) {
+            string? commit_message_suggestion = null;
+            try {
+                commit_message_suggestion = this.get_commit_message_suggestion ();
+            } catch (GLib.Error e) {
+                warning ("Failed to get a suggestion for an alternative commit message due to error %s", e.message);
+            }
+
+            if (commit_message_suggestion != null) {
+                var soup_session = default_soup_session ?? new Soup.Session ();
+                var query_url = "%s/api/v4/projects/%lld/merge_requests/%lld/notes".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
+                info ("Querying URL %s", query_url);
+                var soup_msg = new Soup.Message ("POST", query_url);
+                assert_nonnull (soup_msg);
+                soup_msg.request_headers.append ("Private-Token", this.api_authentication_token);
+                soup_msg.set_request ("application/json", Soup.MemoryUse.COPY, @"{\"body\": \"$commit_message_suggestion\"}".data);
+
+                try {
+                    soup_session.send (soup_msg);
+                } catch (GLib.Error e) {
+                    warning ("Failed to run REST API call: %s", e.message);
+                    return false;
+                }
+
+                if (soup_msg.status_code != 200) {
+                    warning ("Got HTTP status code %u back from gitlab. Response: %s", soup_msg.status_code, (string) soup_msg.response_body.data);
+                    return false;
+                }
+            }
+
             if (this.merge_request.state == MergeRequestState.Opened && this.merge_request.action == MergeRequestAction.Open) {
                 debug ("Querying Gitlab to allow commit from maintainers for MR %lld", this.merge_request.iid);
 
@@ -263,6 +346,21 @@ namespace AlpineQaBot {
 
 
             return true;
+        }
+
+        public string? get_commit_message_suggestion (string? suggestion_file_path = null) throws GLib.Error {
+            var parser = new Json.Parser ();
+            parser.load_from_file (suggestion_file_path ?? "%s/suggestions.json".printf (Config.SYSCONFIG_DIR));
+
+            foreach (var commit_suggestion_obj in parser.get_root ().get_object ().get_array_member ("commit").get_elements ()) {
+                var commit_suggestion = CommitSuggestion.from_json_object ((!)commit_suggestion_obj.get_object ());
+                var match = commit_suggestion.match (this.merge_request.commit.message);
+                if (match != null) {
+                    return match;
+                }
+            }
+
+            return null;
         }
 
         public MergeRequest merge_request { get; private set; }

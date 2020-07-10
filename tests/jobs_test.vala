@@ -97,6 +97,36 @@ void test_merge_request_commit_message_suggestion () {
     }
 }
 
+void commit_suggestion_test_all () {
+    var parser = new Json.Parser ();
+    try {
+        parser.load_from_file (Test.build_filename (Test.FileType.DIST, "../data/suggestions.json"));
+    } catch (GLib.Error e) {
+        error ("Failed to open suggestions file due to error %s", e.message);
+    }
+    var commit_suggestions = new Gee.ArrayList<AlpineQaBot.CommitSuggestion? >();
+
+    foreach (var commit_suggestion_obj in parser.get_root ().get_object ().get_array_member ("commit").get_elements ()) {
+        commit_suggestions.add (AlpineQaBot.CommitSuggestion.from_json_object ((!)commit_suggestion_obj.get_object ()));
+    }
+
+    var value_map = new Gee.HashMap<string, string>();
+    value_map.set ("testing/alpine-qa-bot: update to 0.2", "$repository/$pkgname: upgrade to $pkgver");
+
+    foreach (var bad_msg in value_map.keys) {
+        string suggestion = null;
+        foreach (var commit_suggestion in commit_suggestions) {
+            suggestion = commit_suggestion.match (bad_msg);
+            if (suggestion != null) {
+                break;
+            }
+        }
+
+        assert (value_map.get (bad_msg) == suggestion);
+    }
+
+}
+
 public void main (string[] args) {
     Test.init (ref args);
 
@@ -108,5 +138,6 @@ public void main (string[] args) {
     Test.add_func ("/test/jobs/merge_request_job/from_json", test_merge_request_job_from_json);
     Test.add_func ("/test/jobs/merge_request_job/process", test_merge_request_process);
     Test.add_func ("/test/jobs/merge_request_job/commit_message_suggestion", test_merge_request_commit_message_suggestion);
+    Test.add_func ("/test/jobs/commit_suggestion/test_all", commit_suggestion_test_all);
     Test.run ();
 }

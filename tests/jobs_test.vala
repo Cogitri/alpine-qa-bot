@@ -114,6 +114,7 @@ void commit_suggestion_test_all () {
     var value_map = new Gee.HashMap<string, string? >();
     value_map.set ("testing/alpine-qa-bot: update to 0.2", "$repository/$pkgname: upgrade to $pkgver");
     value_map.set ("testing/alpine-qa-bot: upgrade to 0.2", null);
+    value_map.set ("testing/alpine-qa-bot: move to community", "Please use 'move from' instead of 'move to'");
 
     foreach (var bad_msg in value_map.keys) {
         string suggestion = null;

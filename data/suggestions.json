@@ -5,6 +5,12 @@
                 ".*\/.*: update to.*"
             ],
             "suggestion": "$repository/$pkgname: upgrade to $pkgver"
-        }
+        },
+		{
+			"offenders": [
+				".*\/.*: move to.*"
+			],
+			"suggestion": "Please use 'move from' instead of 'move to'"
+		}
     ]
 }

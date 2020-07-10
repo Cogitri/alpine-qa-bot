@@ -110,6 +110,7 @@ void commit_suggestion_test_all () {
         commit_suggestions.add (AlpineQaBot.CommitSuggestion.from_json_object ((!)commit_suggestion_obj.get_object ()));
     }
 
+    // Add new suggestions here
     var value_map = new Gee.HashMap<string, string>();
     value_map.set ("testing/alpine-qa-bot: update to 0.2", "$repository/$pkgname: upgrade to $pkgver");
 

@@ -346,9 +346,10 @@ namespace AlpineQaBot {
             return true;
         }
 
-        public string? get_commit_message_suggestion (string? suggestion_file_path = null) throws GLib.Error {
+        public string? get_commit_message_suggestion () throws GLib.Error {
             var parser = new Json.Parser ();
-            parser.load_from_file (suggestion_file_path ?? "%s/suggestions.json".printf (Config.SYSCONFIG_DIR));
+
+            parser.load_from_file (this.suggestion_file_path ?? "%s/suggestions.json".printf (Config.SYSCONFIG_DIR));
 
             foreach (var commit_suggestion_obj in parser.get_root ().get_object ().get_array_member ("commit").get_elements ()) {
                 var commit_suggestion = CommitSuggestion.from_json_object ((!)commit_suggestion_obj.get_object ());
@@ -361,6 +362,7 @@ namespace AlpineQaBot {
             return null;
         }
 
+        public string? suggestion_file_path { get; set; }
         public MergeRequest merge_request { get; private set; }
     }
 }

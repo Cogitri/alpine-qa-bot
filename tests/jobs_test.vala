@@ -90,7 +90,8 @@ void test_merge_request_commit_message_suggestion () {
     try {
         var job = new AlpineQaBot.MergeRequestJob.from_json (MERGE_REQUEST_TEST_JSON, "https://gitlab.com", "token");
         assert (job != null);
-        assert (job.get_commit_message_suggestion (Test.build_filename (Test.FileType.DIST, "../data/suggestions.json")) == "$repository/$pkgname: upgrade to $pkgver");
+        job.suggestion_file_path = Test.build_filename (Test.FileType.DIST, "../data/suggestions.json");
+        assert (job.get_commit_message_suggestion () == "$repository/$pkgname: upgrade to $pkgver");
     } catch (Error e) {
         assert (false);
     }

@@ -90,14 +90,45 @@ void test_merge_request_commit_message_suggestion () {
     try {
         var job = new AlpineQaBot.MergeRequestJob.from_json (MERGE_REQUEST_TEST_JSON, "https://gitlab.com", "token");
         assert (job != null);
-        info ("%s", job.get_commit_message_suggestion (Test.build_filename (Test.FileType.DIST, "../data/suggestions.json")));
         assert (job.get_commit_message_suggestion (Test.build_filename (Test.FileType.DIST, "../data/suggestions.json")) == "$repository/$pkgname: upgrade to $pkgver");
     } catch (Error e) {
         assert (false);
     }
 }
 
-void commit_suggestion_test_all () {
+void test_merge_request_actions () {
+    try {
+        var job = new AlpineQaBot.MergeRequestJob.from_json (MERGE_REQUEST_TEST_JSON.replace ("open\"", "close\""), "https://gitlab.com", "token");
+        assert (job != null);
+        assert (job.merge_request.action == AlpineQaBot.MergeRequestAction.Close);
+        job = new AlpineQaBot.MergeRequestJob.from_json (MERGE_REQUEST_TEST_JSON.replace ("open\"", "create\""), "https://gitlab.com", "token");
+        assert (job != null);
+        assert (job.merge_request.action == AlpineQaBot.MergeRequestAction.Create);
+        job = new AlpineQaBot.MergeRequestJob.from_json (MERGE_REQUEST_TEST_JSON.replace ("open\"", "update\""), "https://gitlab.com", "token");
+        assert (job != null);
+        assert (job.merge_request.action == AlpineQaBot.MergeRequestAction.Update);
+    } catch (Error e) {
+        assert (false);
+    }
+}
+
+void test_merge_request_states () {
+    try {
+        var job = new AlpineQaBot.MergeRequestJob.from_json (MERGE_REQUEST_TEST_JSON.replace ("opened", "closed"), "https://gitlab.com", "token");
+        assert (job != null);
+        assert (job.merge_request.state == AlpineQaBot.MergeRequestState.Closed);
+        job = new AlpineQaBot.MergeRequestJob.from_json (MERGE_REQUEST_TEST_JSON.replace ("opened", "locked"), "https://gitlab.com", "token");
+        assert (job != null);
+        assert (job.merge_request.state == AlpineQaBot.MergeRequestState.Locked);
+        job = new AlpineQaBot.MergeRequestJob.from_json (MERGE_REQUEST_TEST_JSON.replace ("opened", "merged"), "https://gitlab.com", "token");
+        assert (job != null);
+        assert (job.merge_request.state == AlpineQaBot.MergeRequestState.Merged);
+    } catch (Error e) {
+        assert (false);
+    }
+}
+
+void test_commit_suggestion_test_all () {
     var parser = new Json.Parser ();
     try {
         parser.load_from_file (Test.build_filename (Test.FileType.DIST, "../data/suggestions.json"));
@@ -130,6 +161,37 @@ void commit_suggestion_test_all () {
 
 }
 
+void test_commit_suggestion_bad_regex () {
+    var parser = new Json.Parser ();
+    try {
+        parser.load_from_data (
+            """
+            {
+                "commit": [
+                    {
+                        "offenders": [
+                            ")"
+                        ],
+                        "suggestion": "$repository/$pkgname: upgrade to $pkgver"
+                    }
+                ]
+            }
+            """
+            );
+    } catch (GLib.Error e) {
+        error ("Failed to open suggestions file due to error %s", e.message);
+    }
+
+    Test.expect_message (null, GLib.LogLevelFlags.LEVEL_WARNING, "*Failed to compile Regex due to error*");
+
+    foreach (var json_obj in parser.get_root ().get_object ().get_array_member ("commit").get_elements ()) {
+        var suggestion = AlpineQaBot.CommitSuggestion.from_json_object ((!)json_obj.get_object ());
+        assert (suggestion.match ("commit message") == null);
+    }
+
+    Test.assert_expected_messages ();
+}
+
 public void main (string[] args) {
     Test.init (ref args);
 
@@ -140,7 +202,10 @@ public void main (string[] args) {
     Test.add_func ("/test/jobs/pipeline_job/from_json_merge_request_null", test_pipeline_job_from_json_merge_request_null);
     Test.add_func ("/test/jobs/merge_request_job/from_json", test_merge_request_job_from_json);
     Test.add_func ("/test/jobs/merge_request_job/process", test_merge_request_process);
+    Test.add_func ("/test/jobs/merge_request_job/merge_request_actions", test_merge_request_actions);
+    Test.add_func ("/test/jobs/merge_request_job/merge_request_states", test_merge_request_states);
     Test.add_func ("/test/jobs/merge_request_job/commit_message_suggestion", test_merge_request_commit_message_suggestion);
-    Test.add_func ("/test/jobs/commit_suggestion/test_all", commit_suggestion_test_all);
+    Test.add_func ("/test/jobs/commit_suggestion/test_all", test_commit_suggestion_test_all);
+    Test.add_func ("/test/jobs/commit_suggestion/bad_regex", test_commit_suggestion_bad_regex);
     Test.run ();
 }

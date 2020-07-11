@@ -33,12 +33,12 @@ void test_server_invalid_token_access_denied () {
 
     AlpineQaBot.WebHookEventListenerServer ev = null;
     try {
-        ev = new AlpineQaBot.WebHookEventListenerServer (instance_url, ONLINE_TEST_GITLAB_TOKEN, api_token, 8012);
+        ev = new AlpineQaBot.WebHookEventListenerServer (instance_url, ONLINE_TEST_GITLAB_TOKEN, api_token, 8013);
     } catch (Error e) {
-        error ("Failed to listen on port %u due to error %s", 8012, e.message);
+        error ("Failed to listen on port %u due to error %s", 8013, e.message);
     }
 
-    var soup_message = new Soup.Message ("PUT", "http://localhost:8012/triage/system-hooks");
+    var soup_message = new Soup.Message ("PUT", "http://localhost:8013/triage/system-hooks");
     var soup_session = TestLib.get_test_soup_session (mock_server);
     soup_message.request_headers.append ("X-Gitlab-Token", "INVALID_TOKEN");
     soup_session.queue_message (soup_message, (session, msg) => {
@@ -75,12 +75,12 @@ void test_server_merge_request_job_process () {
 
     AlpineQaBot.WebHookEventListenerServer ev = null;
     try {
-        ev = new AlpineQaBot.WebHookEventListenerServer (instance_url, ONLINE_TEST_GITLAB_TOKEN, api_token, 8012);
+        ev = new AlpineQaBot.WebHookEventListenerServer (instance_url, ONLINE_TEST_GITLAB_TOKEN, api_token, 8014);
     } catch (Error e) {
-        error ("Failed to listen on port %u due to error %s", 8012, e.message);
+        error ("Failed to listen on port %u due to error %s", 8014, e.message);
     }
 
-    var soup_message = new Soup.Message ("PUT", "http://localhost:8012/triage/system-hooks");
+    var soup_message = new Soup.Message ("PUT", "http://localhost:8014/triage/system-hooks");
     var req_soup_session = new Soup.Session ();
 
     soup_message.request_headers.append ("X-Gitlab-Token", ONLINE_TEST_GITLAB_TOKEN);
@@ -109,6 +109,150 @@ void test_server_merge_request_job_process () {
     mock_server.end_trace ();
 }
 
+void test_server_merge_request_job_invalid () {
+    try {
+        mock_server.start_trace ("server_merge_request_job_invalid");
+    } catch (Error e) {
+        error ("%s", e.message);
+    }
+
+    MainLoop loop = new MainLoop ();
+    string instance_url = null;
+    string api_token = null;
+    if (mock_server.enable_online) {
+        instance_url = ONLINE_TEST_GITLAB_INSTANCE;
+        api_token = ONLINE_TEST_GITLAB_ACCESS_TOKEN;
+    } else {
+        instance_url = "https://%s:%u".printf (mock_server.address, mock_server.port);
+        api_token = "MOCK_TOKEN";
+    }
+
+    AlpineQaBot.WebHookEventListenerServer ev = null;
+    try {
+        ev = new AlpineQaBot.WebHookEventListenerServer (instance_url, ONLINE_TEST_GITLAB_TOKEN, api_token, 8015);
+    } catch (Error e) {
+        error ("Failed to listen on port %u due to error %s", 8015, e.message);
+    }
+
+    var soup_message = new Soup.Message ("PUT", "http://localhost:8015/triage/system-hooks");
+    var req_soup_session = new Soup.Session ();
+
+    soup_message.request_headers.append ("X-Gitlab-Token", ONLINE_TEST_GITLAB_TOKEN);
+    soup_message.request_headers.append ("X-Gitlab-Event", "Merge Request Hook");
+    soup_message.set_request ("application/json", Soup.MemoryUse.STATIC, "{invalid}".data);
+    soup_message.set_status (200);
+    req_soup_session.queue_message (soup_message, (session, msg) => {
+        assert ((string) msg.response_body.data == "{'message': 'FAIL'}");
+        assert (msg.status_code == 500);
+        ev.job_received (new AlpineQaBot.JobShutdown ());
+    });
+
+    ev.job_received.connect ((job) => {
+        if (job is AlpineQaBot.JobShutdown) {
+            loop.quit ();
+        }
+        job.process (TestLib.get_test_soup_session (mock_server));
+    });
+
+    Test.expect_message (null, GLib.LogLevelFlags.LEVEL_WARNING, "*Failed to add new job due to error*");
+
+    loop.run ();
+
+    Test.assert_expected_messages ();
+
+    mock_server.end_trace ();
+}
+
+void test_server_job_unknown () {
+    try {
+        mock_server.start_trace ("server_job_unknown");
+    } catch (Error e) {
+        error ("%s", e.message);
+    }
+
+    MainLoop loop = new MainLoop ();
+    string instance_url = null;
+    string api_token = null;
+    if (mock_server.enable_online) {
+        instance_url = ONLINE_TEST_GITLAB_INSTANCE;
+        api_token = ONLINE_TEST_GITLAB_ACCESS_TOKEN;
+    } else {
+        instance_url = "https://%s:%u".printf (mock_server.address, mock_server.port);
+        api_token = "MOCK_TOKEN";
+    }
+
+    AlpineQaBot.WebHookEventListenerServer ev = null;
+    try {
+        ev = new AlpineQaBot.WebHookEventListenerServer (instance_url, ONLINE_TEST_GITLAB_TOKEN, api_token, 8016);
+    } catch (Error e) {
+        error ("Failed to listen on port %u due to error %s", 8016, e.message);
+    }
+
+    var soup_message = new Soup.Message ("PUT", "http://localhost:8016/triage/system-hooks");
+    var req_soup_session = new Soup.Session ();
+
+    soup_message.request_headers.append ("X-Gitlab-Token", ONLINE_TEST_GITLAB_TOKEN);
+    soup_message.request_headers.append ("X-Gitlab-Event", "Unknown");
+    soup_message.set_status (200);
+    req_soup_session.queue_message (soup_message, (session, msg) => {
+        assert ((string) msg.response_body.data == "{'message': 'OK'}");
+        assert (msg.status_code == 200);
+        ev.job_received (new AlpineQaBot.JobShutdown ());
+    });
+
+    ev.job_received.connect ((job) => {
+        if (job is AlpineQaBot.JobShutdown) {
+            loop.quit ();
+        }
+        job.process (TestLib.get_test_soup_session (mock_server));
+    });
+
+    Test.expect_message (null, GLib.LogLevelFlags.LEVEL_WARNING, "*Received unknown event Unknown*");
+
+    loop.run ();
+
+    Test.assert_expected_messages ();
+
+    mock_server.end_trace ();
+}
+
+void test_server_landig_page_success () {
+    try {
+        mock_server.start_trace ("server_job_unknown");
+    } catch (Error e) {
+        error ("%s", e.message);
+    }
+
+    MainLoop loop = new MainLoop ();
+
+    AlpineQaBot.WebHookEventListenerServer ev = null;
+    try {
+        ev = new AlpineQaBot.WebHookEventListenerServer ("", "", "", 8017);
+    } catch (Error e) {
+        error ("Failed to listen on port %u due to error %s", 8017, e.message);
+    }
+
+    var soup_message = new Soup.Message ("PUT", "http://localhost:8017/");
+    var req_soup_session = new Soup.Session ();
+
+    soup_message.set_status (200);
+    req_soup_session.queue_message (soup_message, (session, msg) => {
+        assert ((string) msg.response_body.data == "<html><head><title>Gitlab-Bot status page</title></head><body><h1>Status:</h1><p>Up and running!</p></body></html>");
+        assert (msg.status_code == 200);
+        ev.job_received (new AlpineQaBot.JobShutdown ());
+    });
+
+    ev.job_received.connect ((job) => {
+        if (job is AlpineQaBot.JobShutdown) {
+            loop.quit ();
+        }
+    });
+
+    loop.run ();
+
+    mock_server.end_trace ();
+}
+
 public void main (string[] args) {
     Test.init (ref args);
 
@@ -117,5 +261,8 @@ public void main (string[] args) {
 
     Test.add_func ("/test/server/token/invalid_access_denied", test_server_invalid_token_access_denied);
     Test.add_func ("/test/server/jobs/merge_request_job/process", test_server_merge_request_job_process);
+    Test.add_func ("/test/server/jobs/merge_request_job/invalid", test_server_merge_request_job_invalid);
+    Test.add_func ("/test/server/jobs/unknown", test_server_job_unknown);
+    Test.add_func ("/test/server/landing_page/success", test_server_landig_page_success);
     Test.run ();
 }

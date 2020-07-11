@@ -175,7 +175,8 @@ namespace AlpineQaBot {
                 return false;
             }
 
-            if (this.soup_message.status_code != 200) {
+            // https://docs.gitlab.com/ee/api/#status-codes
+            if (!(this.soup_message.status_code == 200 || this.soup_message.status_code == 201 || this.soup_message.status_code == 204)) {
                 warning ("Got HTTP status code %u back from gitlab. Response: %s", this.soup_message.status_code, (string) this.soup_message.response_body.data);
                 return false;
             }

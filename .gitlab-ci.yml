@@ -32,7 +32,7 @@ coverage:
     - cd _build/alpine-qa-bot
     - lcov -d . -o lcov.info -c
     - lcov -d . -o lcov.info -r lcov.info "*/_build/*"
-    - genhtml -t "gpseq" -o ../../coverage lcov.info
+    - genhtml -t "alpine-qa-bot" -o ../../coverage lcov.info
     - lcov -l lcov.info
   coverage: '/Total:\| *(\d+\.?\d+\%)/'
   tags:

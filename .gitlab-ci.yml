@@ -9,6 +9,9 @@ test:
     - apk add meson vala pc:glib-2.0 pc:gobject-2.0 pc:libsoup-2.4 pc:json-glib-1.0 pc:gee-0.8 pc:libuhttpmock-0.0 openssl alpine-sdk
   script:
     - meson build && meson compile -C build && meson test -v -C build
+  tags:
+    - ci-build
+    - x86_64
 
 coverage:
   image: debian:bullseye-slim
@@ -32,3 +35,6 @@ coverage:
     - genhtml -t "gpseq" -o ../../coverage lcov.info
     - lcov -l lcov.info
   coverage: '/Total:\| *(\d+\.?\d+\%)/'
+  tags:
+    - ci-build
+    - x86_64

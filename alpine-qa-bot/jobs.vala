@@ -30,13 +30,13 @@ namespace AlpineQaBot {
     }
 
     public struct Project {
-        public Project (int64 id, string name) {
+        public Project (int64 id, string? name) {
             this.id = id;
             this.name = name;
         }
 
         public int64 id { get; private set; }
-        public string name { get; private set; }
+        public string? name { get; private set; }
     }
 
     public struct MergeRequest {
@@ -155,31 +155,37 @@ namespace AlpineQaBot {
     }
 
     public class RequestSender : GLib.Object {
-        public RequestSender (string query_url, string http_method, string api_authentication_token, uint8[]? data, Soup.Session? default_soup_session) {
+        public RequestSender (string query_url, string http_method, string? api_authentication_token, uint8[]? data, Soup.Session? default_soup_session) {
             this.soup_session = default_soup_session ?? new Soup.Session ();
             this.soup_message = new Soup.Message (http_method, query_url);
 
             info ("Querying URL %s", query_url);
             assert_nonnull (soup_message);
-            soup_message.request_headers.append ("Private-Token", api_authentication_token);
+            if (api_authentication_token != null) {
+                soup_message.request_headers.append ("Private-Token", api_authentication_token);
+            }
             if (data != null) {
                 soup_message.set_request ("application/json", Soup.MemoryUse.COPY, data);
             }
         }
 
-        public bool send () {
+        public bool send (out string reply) {
             try {
-                soup_session.send (this.soup_message);
+                this.soup_session.send (this.soup_message);
             } catch (GLib.Error e) {
                 warning ("Failed to run REST API call: %s", e.message);
+                reply = null;
                 return false;
             }
 
             // https://docs.gitlab.com/ee/api/#status-codes
             if (!(this.soup_message.status_code == 200 || this.soup_message.status_code == 201 || this.soup_message.status_code == 204)) {
                 warning ("Got HTTP status code %u back from gitlab. Response: %s", this.soup_message.status_code, (string) this.soup_message.response_body.data);
+                reply = null;
                 return false;
             }
+
+            reply = (string) this.soup_message.response_body.data;
 
             return true;
         }
@@ -220,9 +226,8 @@ namespace AlpineQaBot {
     }
 
     public class PipelineJob : Job {
-        public PipelineJob (Project project, string source, string gitlab_instance_url, string api_authentication_token) {
+        public PipelineJob (Project project, string gitlab_instance_url, string api_authentication_token) {
             base (project, gitlab_instance_url, api_authentication_token);
-            this.source = source;
         }
 
         public PipelineJob.from_json (string json, string gitlab_instance_url, string api_authentication_token) throws GLib.Error {
@@ -230,16 +235,13 @@ namespace AlpineQaBot {
             parser.load_from_data (json);
             var root_object = parser.get_root ().get_object ();
 
-            base.from_json_object ((!)root_object.get_object_member ("project"), gitlab_instance_url, api_authentication_token);
+            var project = Project (root_object.get_int_member ("source_project_id"), null);
+            base (project, gitlab_instance_url, api_authentication_token);
 
-            if (root_object.has_member ("merge_request") && !root_object.get_null_member ("merge_request")) {
-                this.merge_request = MergeRequest.from_json_object ((!)root_object.get_object_member ("merge_request"));
-            }
+            this.merge_request_iid = root_object.get_int_member ("iid");
 
-            this.source = root_object.get_object_member ("object_attributes").get_string_member ("source");
-
-            var object_attributes = root_object.get_object_member ("object_attributes");
-            switch (object_attributes.get_string_member ("status")) {
+            var pipeline_status = root_object.get_object_member ("head_pipeline").get_string_member ("status");
+            switch (pipeline_status) {
             case "canceled":
                 this.status = PipelineStatus.Canceled;
                 break;
@@ -265,15 +267,15 @@ namespace AlpineQaBot {
                 this.status = PipelineStatus.Success;
                 break;
             default:
-                error ("Unknown pipeline status %s", object_attributes.get_string_member ("status"));
+                error ("Unknown pipeline status %s", pipeline_status);
             }
         }
 
         public override bool process (Soup.Session? default_soup_session = null) {
-            if ((this.status == PipelineStatus.Failed || this.status == PipelineStatus.Success) && this.merge_request != null) {
+            if ((this.status == PipelineStatus.Failed || this.status == PipelineStatus.Success)) {
                 debug ("Querying Gitlab to add/remove status:mr-build-broken label to successfull/failing MR");
 
-                var query_url = "%s/api/v4/projects/%lld/merge_requests/%lld".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
+                var query_url = "%s/api/v4/projects/%lld/merge_requests/%lld".printf (this.gitlab_instance_url, this.project.id, this.merge_request_iid);
 
                 string message = null;
                 if (this.status == PipelineStatus.Failed) {
@@ -284,7 +286,7 @@ namespace AlpineQaBot {
 
                 var request_sender = new RequestSender (query_url, "PUT", this.api_authentication_token, message.data, default_soup_session);
 
-                if (!request_sender.send ()) {
+                if (!request_sender.send (null)) {
                     return false;
                 }
             }
@@ -293,9 +295,8 @@ namespace AlpineQaBot {
             return true;
         }
 
-        public string source { get; private set; }
+        public int64 merge_request_iid { get; private set; }
         public PipelineStatus status { get; private set; }
-        public MergeRequest? merge_request { get; private set; }
     }
 
     public class MergeRequestJob : Job {
@@ -326,7 +327,7 @@ namespace AlpineQaBot {
 
                 var query_url = "%s/api/v4/projects/%lld/merge_requests/%lld/notes".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
                 var request_sender = new RequestSender (query_url, "POST", this.api_authentication_token, @"{\"body\": \"$commit_message_suggestion\"}".data, default_soup_session);
-                if (!request_sender.send ()) {
+                if (!request_sender.send (null)) {
                     return false;
                 }
             }
@@ -338,7 +339,7 @@ namespace AlpineQaBot {
                 // FIXME: Gitlab API doesn't know allow_collaboration is a valid parameter and wants us to specify at least one valid param,
                 // so we just specify an empty add_labels here.
                 var request_sender = new RequestSender (query_url, "PUT", this.api_authentication_token, "{\"add_labels\": null,\"allow_collaboration\": true}".data, default_soup_session);
-                if (!request_sender.send ()) {
+                if (!request_sender.send (null)) {
                     return false;
                 }
             }

@@ -31,6 +31,8 @@ add_project_arguments(
 # Configuration
 conf = configuration_data()
 conf.set_quoted('SYSCONFIG_DIR', get_option('prefix') / get_option('sysconfdir'))
+conf.set_quoted('SHARED_STATE_DIR', get_option('prefix') / get_option('sharedstatedir'))
+
 configure_file(output: 'config.h', configuration: conf)
 # Include config.h
 add_project_arguments(

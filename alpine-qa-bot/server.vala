@@ -5,7 +5,7 @@
  */
 namespace AlpineQaBot {
     public class WebHookEventListenerServer : Soup.Server {
-        public WebHookEventListenerServer (string gitlab_instance_url, string gitlab_token, string api_authentication_token, uint server_listen_port) throws GLib.Error {
+        public WebHookEventListenerServer (string gitlab_instance_url, string gitlab_token, string api_authentication_token, uint server_listen_port, int[] poller_project_ids) throws GLib.Error {
             Object ();
             assert (this != null);
 
@@ -18,6 +18,27 @@ namespace AlpineQaBot {
             this.add_handler (null, default_handler);
             this.listen_all (server_listen_port, Soup.ServerListenOptions.IPV4_ONLY);
 
+            if (poller_project_ids.length != 0) {
+                this.poller = new Poller (api_authentication_token, gitlab_instance_url);
+
+                GLib.Timeout.add_seconds (300, () => {
+                    foreach (var id in poller_project_ids) {
+                        PipelineJob[]? jobs = null;
+                        try {
+                            jobs = this.poller.poll (id, null);
+                        } catch (DatabaseError e) {
+                            warning ("Failed to poll for changes due to error %s", e.message);
+                        }
+                        if (jobs != null) {
+                            foreach (var job in jobs) {
+                                this.job_received (job);
+                            }
+                        }
+                    }
+
+                    return GLib.Source.CONTINUE;
+                });
+            }
         }
 
         private static void gitlab_post_handler (Soup.Server server, Soup.Message msg, string path, GLib.HashTable ? query, Soup.ClientContext client) {
@@ -76,6 +97,7 @@ namespace AlpineQaBot {
             msg.set_status (Soup.Status.OK);
         }
 
+        private Poller poller { private get; private set; }
         private string api_authentication_token { private get; private set; }
         private string gitlab_token { private get; private set; }
         private string gitlab_instance_url { private get; private set; }

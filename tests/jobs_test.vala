@@ -147,6 +147,7 @@ void test_commit_suggestion_test_all () {
     value_map.set ("testing/alpine-qa-bot: update to 0.2", "$repository/$pkgname: upgrade to $pkgver");
     value_map.set ("testing/alpine-qa-bot: upgrade to 0.2", null);
     value_map.set ("testing/alpine-qa-bot: move to community", "Please use 'move from' instead of 'move to'");
+    value_map.set ("community/alpine-qa-bot: import from testing", "Please use 'move from' instead of 'import from'");
 
     foreach (var bad_msg in value_map.keys) {
         string suggestion = null;

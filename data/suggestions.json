@@ -11,6 +11,12 @@
 				".*\/.*: move to.*"
 			],
 			"suggestion": "Please use 'move from' instead of 'move to'"
+		},
+		{
+			"offenders": [
+				".*\/.*: import from.*"
+			],
+			"suggestion": "Please use 'move from' instead of 'import from'"
 		}
     ]
 }

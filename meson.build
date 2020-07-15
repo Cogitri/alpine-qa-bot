@@ -12,6 +12,7 @@ deps = [
     dependency('threads'),
     dependency('json-glib-1.0'),
     dependency('gee-0.8'),
+    dependency('sqlite3'),
 ]
 
 test_deps = [

@@ -40,3 +40,15 @@ test(
     server_test_exe,
     env: ['G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()), 'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir())],
 )
+
+database_test_exe = executable(
+    'alpine-qa-bot-database-test',
+    files('database_test.vala'),
+    dependencies: [static_lib_dep, test_lib_dep],
+)
+
+test(
+    'database-test',
+    database_test_exe,
+    env: ['G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()), 'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir())],
+)

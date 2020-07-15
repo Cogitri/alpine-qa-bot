@@ -1,4 +1,5 @@
 lib_src = files(
+    'database.vala',
     'jobs.vala',
     'server.vala',
 )

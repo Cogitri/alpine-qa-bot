@@ -32,6 +32,7 @@ namespace AlpineQaBot {
             PipelineJob[] res = {};
             try {
                 foreach (var merge_request in merge_requests) {
+                    var merge_request_id = merge_request.get_object ().get_int_member ("id");
                     var merge_request_iid = merge_request.get_object ().get_int_member ("iid");
                     var merge_request_query_url = "%s/api/v4/projects/%u/merge_requests/%lld".printf (this.gitlab_instance_url, project_id, merge_request_iid);
                     var merge_request_sender = new RequestSender (merge_request_query_url, "GET", null, null, default_soup_session);
@@ -41,12 +42,12 @@ namespace AlpineQaBot {
 
                     merge_request_sender.send (out merge_request_json_reply);
                     pipeline_job = new PipelineJob.from_json (merge_request_json_reply, this.gitlab_instance_url, this.api_auth_token);
-                    merge_request_info = database.get_merge_request_info (merge_request_iid);
+                    merge_request_info = database.get_merge_request_info (merge_request_id);
                     if (merge_request_info == null || merge_request_info.pipeline_status != pipeline_job.status) {
                         res += pipeline_job;
                         merge_request_info = new MergeRequestInfo (pipeline_job.status);
                     }
-                    database.save_merge_request_info (merge_request_iid, merge_request_info);
+                    database.save_merge_request_info (merge_request_id, merge_request_info);
                 }
             } catch (GLib.Error e) {
                 warning ("Failed to iterate over merge requests due to error %s", e.message);

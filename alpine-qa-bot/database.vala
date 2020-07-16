@@ -22,17 +22,17 @@ namespace AlpineQaBot {
         SAVE_FAILED,
         GET_FAILED,
         DATA_MALFORMED,
-        UNKNOWN_IID,
+        UNKNOWN_ID,
     }
 
     public interface Database {
         public abstract void open(string filename) throws DatabaseError;
 
-        public abstract void save_merge_request_info(int64 iid, MergeRequestInfo merge_request_info) throws DatabaseError;
+        public abstract void save_merge_request_info(int64 id, MergeRequestInfo merge_request_info) throws DatabaseError;
 
         public abstract void save_all_merge_request_info(Gee.HashMap<int64? , MergeRequestInfo> merge_request_info) throws DatabaseError;
 
-        public abstract MergeRequestInfo get_merge_request_info(int64 iid) throws DatabaseError;
+        public abstract MergeRequestInfo get_merge_request_info(int64 id) throws DatabaseError;
 
         public abstract Gee.HashMap<int64? , MergeRequestInfo> get_all_merge_request_info() throws DatabaseError;
 
@@ -43,8 +43,8 @@ namespace AlpineQaBot {
             int rc;
             const string setup_query = """
                 CREATE TABLE MR_Info (
-                    iid     INT     PRIMARY KEY     NOT NULL,
-                    mr_info TEXT                    NOT NULL
+                    id      PRIMARY_KEY     INT     NOT NULL,
+                    mr_info                 TEXT    NOT NULL
                 );
             """;
             string errmsg;
@@ -62,8 +62,8 @@ namespace AlpineQaBot {
 
         }
 
-        public void save_merge_request_info (int64 iid, MergeRequestInfo merge_request_info) throws DatabaseError {
-            string query = "INSERT INTO MR_Info (iid, mr_info) VALUES (%lld, '%s')\n".printf (iid, Json.gobject_to_data (merge_request_info, null));
+        public void save_merge_request_info (int64 id, MergeRequestInfo merge_request_info) throws DatabaseError {
+            string query = "INSERT INTO MR_Info (id, mr_info) VALUES (%lld, '%s')\n".printf (id, Json.gobject_to_data (merge_request_info, null));
             int rc;
             string errmsg;
 
@@ -77,8 +77,8 @@ namespace AlpineQaBot {
             string errmsg;
             string query = "";
 
-            foreach (var iid in merge_request_info.keys) {
-                query += "INSERT INTO MR_Info (iid, mr_info) VALUES (%lld, '%s')\n".printf (iid, Json.gobject_to_data (merge_request_info.get (iid), null));
+            foreach (var id in merge_request_info.keys) {
+                query += "INSERT INTO MR_Info (id, mr_info) VALUES (%lld, '%s')\n".printf (id, Json.gobject_to_data (merge_request_info.get (id), null));
             }
 
             if ((rc = this.db.exec (query, null, out errmsg)) != Sqlite.OK) {
@@ -86,10 +86,10 @@ namespace AlpineQaBot {
             }
         }
 
-        public MergeRequestInfo get_merge_request_info (int64 iid) throws DatabaseError {
+        public MergeRequestInfo get_merge_request_info (int64 id) throws DatabaseError {
             int rc;
             Sqlite.Statement stmt;
-            string query = "SELECT * FROM MR_Info WHERE iid = %lld".printf (iid);
+            string query = "SELECT * FROM MR_Info WHERE id = %lld".printf (id);
 
             if ((rc = this.db.prepare_v2 (query, -1, out stmt, null)) == 1) {
                 throw new DatabaseError.GET_FAILED ("Failed to get MR Info from SQLite database due to error %s", db.errmsg ());
@@ -100,7 +100,7 @@ namespace AlpineQaBot {
             try {
                 var data = stmt.column_text (1);
                 if (data == null) {
-                    throw new DatabaseError.UNKNOWN_IID ("Couldn't find MergeRequestInfo for iid %lld", iid);
+                    throw new DatabaseError.UNKNOWN_ID ("Couldn't find MergeRequestInfo for id %lld", id);
                 }
                 info = Json.gobject_from_data (typeof (MergeRequestInfo), data) as MergeRequestInfo;
             } catch (GLib.Error e) {
@@ -125,11 +125,11 @@ namespace AlpineQaBot {
             cols = stmt.column_count ();
 
             while (stmt.step () == Sqlite.ROW) {
-                int64 iid = stmt.column_int64 (0);
+                int64 id = stmt.column_int64 (0);
                 try {
                     var info = Json.gobject_from_data (typeof (MergeRequestInfo), stmt.column_text (1)) as MergeRequestInfo;
                     assert_nonnull (info);
-                    map.set (iid, info);
+                    map.set (id, info);
                 } catch (GLib.Error e) {
                     throw new DatabaseError.DATA_MALFORMED ("Failed to parse data due to error %s", e.message);
                 }

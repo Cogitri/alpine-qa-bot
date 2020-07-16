@@ -170,13 +170,7 @@ namespace AlpineQaBot {
         }
 
         public bool send (out string reply) {
-            try {
-                this.soup_session.send (this.soup_message);
-            } catch (GLib.Error e) {
-                warning ("Failed to run REST API call: %s", e.message);
-                reply = null;
-                return false;
-            }
+            this.soup_session.send_message (this.soup_message);
 
             // https://docs.gitlab.com/ee/api/#status-codes
             if (!(this.soup_message.status_code == 200 || this.soup_message.status_code == 201 || this.soup_message.status_code == 204)) {

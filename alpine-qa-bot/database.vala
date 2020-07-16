@@ -22,7 +22,6 @@ namespace AlpineQaBot {
         SAVE_FAILED,
         GET_FAILED,
         DATA_MALFORMED,
-        UNKNOWN_ID,
     }
 
     public interface Database {
@@ -32,7 +31,7 @@ namespace AlpineQaBot {
 
         public abstract void save_all_merge_request_info(Gee.HashMap<int64? , MergeRequestInfo> merge_request_info) throws DatabaseError;
 
-        public abstract MergeRequestInfo get_merge_request_info(int64 id) throws DatabaseError;
+        public abstract MergeRequestInfo? get_merge_request_info (int64 id) throws DatabaseError;
 
         public abstract Gee.HashMap<int64? , MergeRequestInfo> get_all_merge_request_info() throws DatabaseError;
 
@@ -86,7 +85,7 @@ namespace AlpineQaBot {
             }
         }
 
-        public MergeRequestInfo get_merge_request_info (int64 id) throws DatabaseError {
+        public MergeRequestInfo? get_merge_request_info (int64 id) throws DatabaseError {
             int rc;
             Sqlite.Statement stmt;
             string query = "SELECT * FROM MR_Info WHERE id = %lld".printf (id);
@@ -97,11 +96,11 @@ namespace AlpineQaBot {
 
             stmt.step ();
             MergeRequestInfo? info;
+            var data = stmt.column_text (1);
+            if (data == null) {
+                return null;
+            }
             try {
-                var data = stmt.column_text (1);
-                if (data == null) {
-                    throw new DatabaseError.UNKNOWN_ID ("Couldn't find MergeRequestInfo for id %lld", id);
-                }
                 info = Json.gobject_from_data (typeof (MergeRequestInfo), data) as MergeRequestInfo;
             } catch (GLib.Error e) {
                 throw new DatabaseError.DATA_MALFORMED ("Failed to parse data due to error %s", e.message);

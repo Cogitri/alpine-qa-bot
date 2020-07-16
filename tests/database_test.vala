@@ -6,32 +6,21 @@
 
 void test_database_init () {
     var db = new AlpineQaBot.SqliteDatabase ();
-
-    string tmp_dir;
-    try {
-        tmp_dir = GLib.DirUtils.make_tmp ("alpine-qa-bot-tests-XXXXXX");
-    } catch (GLib.Error e) {
-        error (e.message);
-    }
+    var tmp_dir = new TestLib.TestTempFile ();
 
     try {
-        db.open ("%s/test_init.db".printf (tmp_dir));
+        db.open ("%s/test_init.db".printf (tmp_dir.file_path));
     } catch (AlpineQaBot.DatabaseError e) {
         error (e.message);
     }
 }
 
 void test_database_get_set_merge_request_info () {
-    string tmp_dir;
-    try {
-        tmp_dir = GLib.DirUtils.make_tmp ("alpine-qa-bot-tests-XXXXXX");
-    } catch (GLib.Error e) {
-        error (e.message);
-    }
-
     var db = new AlpineQaBot.SqliteDatabase ();
+    var tmp_dir = new TestLib.TestTempFile ();
+
     try {
-        db.open ("%s/test_get_set_merge_request_info.db".printf (tmp_dir));
+        db.open ("%s/test_get_set_merge_request_info.db".printf (tmp_dir.file_path));
     } catch (AlpineQaBot.DatabaseError e) {
         error (e.message);
     }
@@ -51,18 +40,13 @@ void test_database_get_set_merge_request_info () {
 }
 
 void test_database_get_set_merge_request_info_existing_db () {
-    string tmp_dir;
-    try {
-        tmp_dir = GLib.DirUtils.make_tmp ("alpine-qa-bot-tests-XXXXXX");
-    } catch (GLib.Error e) {
-        error (e.message);
-    }
+    var tmp_dir = new TestLib.TestTempFile ();
     var merge_request_info = new AlpineQaBot.MergeRequestInfo (AlpineQaBot.PipelineStatus.Success);
 
     {
         var db = new AlpineQaBot.SqliteDatabase ();
         try {
-            db.open ("%s/test_get_set_merge_request_info.db".printf (tmp_dir));
+            db.open ("%s/test_get_set_merge_request_info.db".printf (tmp_dir.file_path));
         } catch (AlpineQaBot.DatabaseError e) {
             error (e.message);
         }
@@ -76,7 +60,7 @@ void test_database_get_set_merge_request_info_existing_db () {
     {
         var db = new AlpineQaBot.SqliteDatabase ();
         try {
-            db.open ("%s/test_get_set_merge_request_info.db".printf (tmp_dir));
+            db.open ("%s/test_get_set_merge_request_info.db".printf (tmp_dir.file_path));
         } catch (AlpineQaBot.DatabaseError e) {
             error (e.message);
         }

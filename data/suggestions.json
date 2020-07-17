@@ -4,19 +4,19 @@
             "offenders": [
                 ".*\/.*: update to.*"
             ],
-            "suggestion": "$repository/$pkgname: upgrade to $pkgver"
+            "suggestion": "Please use the commit format: `$repository/$pkgname: upgrade to $pkgver`"
         },
-		{
-			"offenders": [
-				".*\/.*: move to.*"
-			],
-			"suggestion": "Please use 'move from' instead of 'move to'"
-		},
-		{
-			"offenders": [
-				".*\/.*: import from.*"
-			],
-			"suggestion": "Please use 'move from' instead of 'import from'"
-		}
+        {
+            "offenders": [
+                ".*\/.*: move to.*"
+            ],
+            "suggestion": "Please use 'move from' instead of 'move to'"
+        },
+        {
+            "offenders": [
+                ".*\/.*: import from.*"
+            ],
+            "suggestion": "Please use 'move from' instead of 'import from'"
+        }
     ]
 }

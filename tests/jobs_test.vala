@@ -77,7 +77,7 @@ void test_merge_request_commit_message_suggestion () {
         var job = new AlpineQaBot.MergeRequestJob.from_json (MERGE_REQUEST_TEST_JSON, "https://gitlab.com", "token");
         assert (job != null);
         job.suggestion_file_path = Test.build_filename (Test.FileType.DIST, "../data/suggestions.json");
-        assert (job.get_commit_message_suggestion () == "$repository/$pkgname: upgrade to $pkgver");
+        assert (job.get_commit_message_suggestion () == "Please use the commit format: `$repository/$pkgname: upgrade to $pkgver`");
     } catch (Error e) {
         assert (false);
     }
@@ -130,7 +130,7 @@ void test_commit_suggestion_test_all () {
 
     // Add new suggestions here
     var value_map = new Gee.HashMap<string, string? >();
-    value_map.set ("testing/alpine-qa-bot: update to 0.2", "$repository/$pkgname: upgrade to $pkgver");
+    value_map.set ("testing/alpine-qa-bot: update to 0.2", "Please use the commit format: `$repository/$pkgname: upgrade to $pkgver`");
     value_map.set ("testing/alpine-qa-bot: upgrade to 0.2", null);
     value_map.set ("testing/alpine-qa-bot: move to community", "Please use 'move from' instead of 'move to'");
     value_map.set ("community/alpine-qa-bot: import from testing", "Please use 'move from' instead of 'import from'");

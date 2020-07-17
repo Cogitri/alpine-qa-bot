@@ -320,7 +320,7 @@ namespace AlpineQaBot {
                 debug ("Querying Gitlab to suggest better commit message for MR %lld", this.merge_request.iid);
 
                 var query_url = "%s/api/v4/projects/%lld/merge_requests/%lld/notes".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
-                var request_sender = new RequestSender (query_url, "POST", this.api_authentication_token, @"{\"body\": \"$commit_message_suggestion\"}".data, default_soup_session);
+                var request_sender = new RequestSender (query_url, "POST", this.api_authentication_token, "{\"body\": \"%s\"}".printf (COMMIT_SUGGESTION_TEMPLATE).printf (commit_message_suggestion).data, default_soup_session);
                 if (!request_sender.send (null)) {
                     return false;
                 }
@@ -360,5 +360,6 @@ namespace AlpineQaBot {
 
         public string? suggestion_file_path { get; set; }
         public MergeRequest merge_request { get; private set; }
+        private const string COMMIT_SUGGESTION_TEMPLATE = "Beep Boop, I'm a bot. I've detected that your commit message doesn't follow Alpine Linux commit guidelines. %s. If you believe this is a mistake, please ping @Cogitri or open an issue at https://gitlab.alpinelinux.org/Cogitri/alpine-qa-bot";
     }
 }

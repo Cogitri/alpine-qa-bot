@@ -362,4 +362,30 @@ namespace AlpineQaBot {
         public MergeRequest merge_request { get; private set; }
         private const string COMMIT_SUGGESTION_TEMPLATE = "Beep Boop, I'm a bot. I've detected that your commit message doesn't follow Alpine Linux commit guidelines. %s. If you believe this is a mistake, please ping @Cogitri or open an issue at https://gitlab.alpinelinux.org/Cogitri/alpine-qa-bot";
     }
+
+    class StaleMergeRequestJob : Job {
+        public StaleMergeRequestJob (Project project, string gitlab_instance_url, string api_auth_token) {
+            base (project, gitlab_instance_url, api_auth_token);
+        }
+
+        public StaleMergeRequestJob.from_json (string json, string gitlab_instance_url, string api_authentication_token) throws GLib.Error {
+            var root_object = Json.from_string (json).get_object ();
+
+            base.from_json_object ((!)root_object.get_object_member ("project"), gitlab_instance_url, api_authentication_token);
+            this.merge_request = MergeRequest.from_json_object ((!)root_object.get_object_member ("object_attributes"));
+            this.last_update = new GLib.DateTime.from_iso8601 (root_object.get_string_member ("updated_at"), null);
+        }
+
+        public override bool process (Soup.Session? default_soup_session = null) {
+            if (this.last_update.difference (new GLib.DateTime.now ()) - TimeSpan.DAY * 14 >= TimeSpan.DAY) {
+
+            }
+
+            return true;
+        }
+
+        public GLib.DateTime last_update { get; private set; }
+        public MergeRequest merge_request { get; private set; }
+        private const string STALE_MERGE_REQUEST_TEMPLATE = "";
+    }
 }

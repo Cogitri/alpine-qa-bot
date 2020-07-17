@@ -28,14 +28,14 @@ void test_poller_poll () {
         api_token = "MOCK_TOKEN";
     }
     var poller = new AlpineQaBot.Poller (api_token, instance_url);
-    AlpineQaBot.PipelineJob[]? jobs;
+    Gee.ArrayList<AlpineQaBot.Job> jobs;
     try {
         jobs = poller.poll (19765543, TestLib.get_test_soup_session (mock_server), tmp_dir.file_path);
     } catch (GLib.Error e) {
         error (e.message);
     }
     assert_nonnull (jobs);
-    assert (jobs.length == 2);
+    assert (jobs.size == 2);
 
     mock_server.end_trace ();
 }

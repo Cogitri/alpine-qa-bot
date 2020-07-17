@@ -5,7 +5,52 @@ namespace AlpineQaBot {
             this.gitlab_instance_url = gitlab_instance_url;
         }
 
-        public PipelineJob[]? poll (uint project_id, Soup.Session? default_soup_session = null, string db_dir = Config.SHARED_STATE_DIR) throws DatabaseError {
+        public Gee.ArrayList<Job> poll (uint project_id, Soup.Session? default_soup_session = null, string db_dir = Config.SHARED_STATE_DIR) throws DatabaseError {
+            Gee.ArrayList<Job> res = new Gee.ArrayList<Job>();
+
+            res.add_all (this.poll_failed_merge_requests (project_id, default_soup_session, db_dir) ?? new Gee.ArrayList<Job>());
+            res.add_all (this.poll_stale_merge_requests (project_id, default_soup_session, db_dir) ?? new Gee.ArrayList<Job>());
+
+            return res;
+        }
+
+        private Gee.ArrayList<Job>? poll_stale_merge_requests (uint project_id, Soup.Session? default_soup_session = null, string db_dir = Config.SHARED_STATE_DIR) throws DatabaseError {
+            GLib.List<weak Json.Node? > merge_requests;
+            string json_reply;
+            var database = new SqliteDatabase ();
+            var parser = new Json.Parser ();
+            var query_url = "%s/api/v4/projects/%u/merge_requests?state=opened&updated_before=%s".printf (this.gitlab_instance_url, project_id, new GLib.DateTime.now ().add_days (-14).to_string ());
+            var request_sender = new RequestSender (query_url, "GET", null, null, default_soup_session);
+
+            request_sender.send (out json_reply);
+
+            if (json_reply == null) {
+                warning ("Didn't get reply from Gitlab for polling...");
+                return null;
+            }
+
+            try {
+                parser.load_from_data (json_reply);
+            } catch (GLib.Error e) {
+                warning ("Failed to parse response containing all open MRs due to error %s", e.message);
+                return null;
+            }
+
+            merge_requests = parser.get_root ().get_array ().get_elements ();
+            database.open ("%s/poller.db".printf (db_dir));
+            Gee.ArrayList<Job> res = new Gee.ArrayList<Job>();
+            try {
+                foreach (var merge_request in merge_requests) {
+                    res.add ((Job) new StaleMergeRequestJob.from_json (merge_request.dup_string (), gitlab_instance_url, api_auth_token));
+                }
+            } catch (GLib.Error e) {
+                warning ("Failed to iterate over stale MRs due to error %s", e.message);
+            }
+
+            return res;
+        }
+
+        private Gee.ArrayList<Job>? poll_failed_merge_requests (uint project_id, Soup.Session? default_soup_session = null, string db_dir = Config.SHARED_STATE_DIR) throws DatabaseError {
             GLib.List<weak Json.Node? > merge_requests;
             string json_reply;
             var database = new SqliteDatabase ();
@@ -29,7 +74,7 @@ namespace AlpineQaBot {
 
             merge_requests = parser.get_root ().get_array ().get_elements ();
             database.open ("%s/poller.db".printf (db_dir));
-            PipelineJob[] res = {};
+            Gee.ArrayList<Job> res = new Gee.ArrayList<Job>();
             try {
                 foreach (var merge_request in merge_requests) {
                     var merge_request_id = merge_request.get_object ().get_int_member ("id");
@@ -44,7 +89,7 @@ namespace AlpineQaBot {
                     pipeline_job = new PipelineJob.from_json (merge_request_json_reply, this.gitlab_instance_url, this.api_auth_token);
                     merge_request_info = database.get_merge_request_info (merge_request_id);
                     if (merge_request_info == null || merge_request_info.pipeline_status != pipeline_job.status) {
-                        res += pipeline_job;
+                        res.add ((Job) pipeline_job);
                         merge_request_info = new MergeRequestInfo (pipeline_job.status);
                     }
                     database.save_merge_request_info (merge_request_id, merge_request_info);

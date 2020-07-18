@@ -94,12 +94,20 @@ namespace AlpineQaBot {
             if (root_obj.has_member ("last_commit") && !root_obj.get_null_member ("last_commit")) {
                 this.commit = Commit.from_json_object ((!)root_obj.get_object_member ("last_commit"));
             }
+
+            if (root_obj.has_member ("labels") && !root_obj.get_null_member ("labels")) {
+                this.labels = new Gee.ArrayList<string>();
+                foreach (var label_obj in root_obj.get_array_member ("labels").get_elements ()) {
+                    labels.add (label_obj.get_string ());
+                }
+            }
         }
 
         public MergeRequestAction? action { get; private set; }
         public Commit? commit { get; private set; }
         public int64 id { get; private set; }
         public int64 iid { get; private set; }
+        public Gee.ArrayList<string>? labels { get; private set; }
         public MergeRequestState state { get; private set; }
         public string target_branch { get; private set; }
         public int64 target_project_id { get; private set; }
@@ -152,6 +160,47 @@ namespace AlpineQaBot {
 
         public Gee.ArrayList<string> offenders;
         public string suggestion { get; private set; }
+    }
+
+    public struct Author {
+
+        public Author (int64 id, string name, string username) {
+            this.id = id;
+            this.name = name;
+            this.username = username;
+        }
+
+        public Author.from_json_object (Json.Object root_obj) {
+            this.id = root_obj.get_int_member ("id");
+            this.name = root_obj.get_string_member ("name");
+            this.username = root_obj.get_string_member ("username");
+        }
+
+        public int64 id { get; private set; }
+        public string name { get; private set; }
+        public string username { get; private set; }
+    }
+
+    public struct Note {
+
+        public Note (Author author, string body, GLib.DateTime created_at, bool system) {
+            this.author = author;
+            this.body = body;
+            this.created_at = created_at;
+            this.system = system;
+        }
+
+        public Note.from_json_object (Json.Object root_obj) {
+            this.author = Author.from_json_object (root_obj.get_object_member ("author"));
+            this.body = root_obj.get_string_member ("body");
+            this.created_at = new GLib.DateTime.from_iso8601 (root_obj.get_string_member ("created_at"), null);
+            this.system = root_obj.get_boolean_member ("system");
+        }
+
+        public Author author { get; private set; }
+        public string body { get; private set; }
+        public GLib.DateTime created_at { get; private set; }
+        public bool system { get; private set; }
     }
 
     public class RequestSender : GLib.Object {
@@ -229,7 +278,7 @@ namespace AlpineQaBot {
             parser.load_from_data (json);
             var root_object = parser.get_root ().get_object ();
 
-            var project = Project (root_object.get_int_member ("source_project_id"), null);
+            var project = Project (root_object.get_int_member ("target_project_id"), null);
             base (project, gitlab_instance_url, api_authentication_token);
 
             this.merge_request_iid = root_object.get_int_member ("iid");
@@ -371,14 +420,32 @@ namespace AlpineQaBot {
         public StaleMergeRequestJob.from_json (string json, string gitlab_instance_url, string api_authentication_token) throws GLib.Error {
             var root_object = Json.from_string (json).get_object ();
 
-            base.from_json_object ((!)root_object.get_object_member ("project"), gitlab_instance_url, api_authentication_token);
-            this.merge_request = MergeRequest.from_json_object ((!)root_object.get_object_member ("object_attributes"));
+            var project = Project (root_object.get_int_member ("target_project_id"), null);
+            base (project, gitlab_instance_url, api_authentication_token);
+            this.merge_request = MergeRequest.from_json_object (root_object);
             this.last_update = new GLib.DateTime.from_iso8601 (root_object.get_string_member ("updated_at"), null);
         }
 
         public override bool process (Soup.Session? default_soup_session = null) {
-            if (this.last_update.difference (new GLib.DateTime.now ()) - TimeSpan.DAY * 14 >= TimeSpan.DAY) {
+            if (this.last_update.add_days (-14).difference (new GLib.DateTime.now ()) <= TimeSpan.DAY) {
+                var mr_query_url = "%s/api/v4/projects/%lld/merge_requests/%lld".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
+                if (this.merge_request.labels.contains ("status:mr-stale")) {
+                    var close_request_sender = new RequestSender (mr_query_url, "PUT", this.api_authentication_token, "{\"state_event\": \"close\"}".data, default_soup_session);
+                    if (!close_request_sender.send (null)) {
+                        return false;
+                    }
+                    return true;
+                } else {
+                    var note_add_request_sender = new RequestSender (mr_query_url + "/notes", "POST", this.api_authentication_token, @"{\"body\": \"$STALE_MERGE_REQUEST_MESSAGE\"}".data, default_soup_session);
+                    if (!note_add_request_sender.send (null)) {
+                        return false;
+                    }
+                    var label_add_request_sender = new RequestSender (mr_query_url, "PUT", this.api_authentication_token, "{\"add_labels\": [\"status:mr-stale\"]}".data, default_soup_session);
 
+                    if (!label_add_request_sender.send (null)) {
+                        return false;
+                    }
+                }
             }
 
             return true;
@@ -386,6 +453,7 @@ namespace AlpineQaBot {
 
         public GLib.DateTime last_update { get; private set; }
         public MergeRequest merge_request { get; private set; }
-        private const string STALE_MERGE_REQUEST_TEMPLATE = "";
+        private const string STALE_MERGE_REQUEST_MESSAGE = "Beep Boop, I'm a bot. I've detected that this merge request hasn't been updated in the last two weeks. It will be closed if no further activity occurs. Thank you for your contributions.";
     }
+
 }

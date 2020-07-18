@@ -8,7 +8,6 @@ Uhm.Server mock_server = null;
 TestLib.TestMode mock_serve_test_mode = TestLib.TestMode.Testing;
 const string ONLINE_TEST_GITLAB_INSTANCE = "https://gitlab.com";
 const string ONLINE_TEST_GITLAB_ACCESS_TOKEN = "PUTTOKENHERE"; // Only required for online tests (so when refreshing uhttp's trace)
-const string ONLINE_TEST_GITLAB_TOKEN = "MOCK_TOKEN";
 
 void test_poller_poll () {
     try {
@@ -35,7 +34,10 @@ void test_poller_poll () {
         error (e.message);
     }
     assert_nonnull (jobs);
-    assert (jobs.size == 2);
+    assert (jobs.size == 4);
+    foreach (var job in jobs) {
+        job.process ();
+    }
 
     mock_server.end_trace ();
 }

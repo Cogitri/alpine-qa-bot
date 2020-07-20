@@ -1,22 +1,22 @@
-> GET /api/v4/projects/19765543/merge_requests?state=opened&updated_before=2020-07-20T11:33:20+0200 HTTP/1.1
-> Soup-Debug-Timestamp: 1595237944
-> Soup-Debug: SoupSession 1 (0x555d0d524100), SoupMessage 1 (0x555d0d5310b0), SoupSocket 1 (0x555d0d94b900)
+> GET /api/v4/projects/19765543/merge_requests?state=opened&labels=status:mr-stale&updated_after=2020-07-20T19:57:00+0000 HTTP/1.1
+> Soup-Debug-Timestamp: 1595275491
+> Soup-Debug: SoupSession 1 (0x55c5ff881100), SoupMessage 1 (0x55c5ff8900b0), SoupSocket 1 (0x55c5ffca8900)
 > Host: gitlab.com
 > Accept-Encoding: gzip, deflate
 > Connection: Keep-Alive
   
 < HTTP/1.1 200 OK
-< Soup-Debug-Timestamp: 1595237945
-< Soup-Debug: SoupMessage 1 (0x555d0d5310b0)
-< Date: Mon, 20 Jul 2020 09:39:04 GMT
+< Soup-Debug-Timestamp: 1595275492
+< Soup-Debug: SoupMessage 1 (0x55c5ff8900b0)
+< Date: Mon, 20 Jul 2020 20:04:51 GMT
 < Content-Type: application/json
 < Transfer-Encoding: chunked
 < Connection: keep-alive
-< Set-Cookie: __cfduid=dd98156cca13c3463d9acc113223a911e1595237944; expires=Wed, 19-Aug-20 09:39:04 GMT; path=/; domain=.gitlab.com; HttpOnly; SameSite=Lax; Secure
+< Set-Cookie: __cfduid=d4fbcd327f056cbcbf70c70a1f87c9b281595275491; expires=Wed, 19-Aug-20 20:04:51 GMT; path=/; domain=.gitlab.com; HttpOnly; SameSite=Lax; Secure
 < Vary: Accept-Encoding
 < Cache-Control: max-age=0, private, must-revalidate
-< Etag: W/"ca60b0991e99732ab913cda97ac78f05"
-< Link: <https://gitlab.com/api/v4/projects/19765543/merge_requests?id=19765543&order_by=created_at&page=1&per_page=20&sort=desc&state=opened&updated_before=2020-07-20T11%3A33%3A20%2B00%3A00&with_labels_details=false&with_merge_status_recheck=false>; rel="first", <https://gitlab.com/api/v4/projects/19765543/merge_requests?id=19765543&order_by=created_at&page=1&per_page=20&sort=desc&state=opened&updated_before=2020-07-20T11%3A33%3A20%2B00%3A00&with_labels_details=false&with_merge_status_recheck=false>; rel="last"
+< Etag: W/"53249b784b13e16a8804d41da56e311e"
+< Link: <https://gitlab.com/api/v4/projects/19765543/merge_requests?id=19765543&labels%5B%5D=status%3Amr-stale&order_by=created_at&page=1&per_page=20&sort=desc&state=opened&updated_after=2020-07-20T19%3A57%3A00%2B00%3A00&with_labels_details=false&with_merge_status_recheck=false>; rel="first", <https://gitlab.com/api/v4/projects/19765543/merge_requests?id=19765543&labels%5B%5D=status%3Amr-stale&order_by=created_at&page=1&per_page=20&sort=desc&state=opened&updated_after=2020-07-20T19%3A57%3A00%2B00%3A00&with_labels_details=false&with_merge_status_recheck=false>; rel="last"
 < Vary: Origin
 < X-Content-Type-Options: nosniff
 < X-Frame-Options: SAMEORIGIN
@@ -24,41 +24,94 @@
 < X-Page: 1
 < X-Per-Page: 20
 < X-Prev-Page: 
-< X-Request-Id: ZKLBvqwkX45
-< X-Runtime: 0.083765
-< X-Total: 2
+< X-Request-Id: FMUPpqUkAR9
+< X-Runtime: 0.077998
+< X-Total: 1
 < X-Total-Pages: 1
 < Strict-Transport-Security: max-age=31536000
 < Referrer-Policy: strict-origin-when-cross-origin
 < Content-Encoding: gzip
-< GitLab-LB: fe-12-lb-gprd
-< GitLab-SV: api-15-sv-gprd
+< RateLimit-Limit: 600
+< RateLimit-Observed: 11
+< RateLimit-Remaining: 589
+< RateLimit-Reset: 1595275551
+< RateLimit-ResetTime: Mon, 20 Jul 2020 20:05:51 GMT
+< GitLab-LB: fe-04-lb-gprd
+< GitLab-SV: localhost
 < CF-Cache-Status: DYNAMIC
-< cf-request-id: 040d3063d9000040bc4316e200000001
+< cf-request-id: 040f6d50230000c4ae3a2b9200000001
 < Expect-CT: max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
 < Server: cloudflare
-< CF-RAY: 5b5bb67fceb940bc-HAM
+< CF-RAY: 5b5f4b2d0ae4c4ae-DUS
 < 
-< [{"id":63768870,"iid":21,"project_id":19765543,"title":"WIP: Ci","description":"","state":"opened","created_at":"2020-07-07T19:10:35.093Z","updated_at":"2020-07-20T09:38:48.088Z","merged_by":null,"merged_at":null,"closed_by":null,"closed_at":null,"target_branch":"master","source_branch":"ci","user_notes_count":7,"upvotes":0,"downvotes":0,"author":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"assignees":[],"assignee":null,"source_project_id":19765591,"target_project_id":19765543,"labels":["status:mr-build-broken"],"work_in_progress":true,"milestone":null,"merge_when_pipeline_succeeds":false,"merge_status":"can_be_merged","sha":"c6070c1d33751bd3852ed2a2bf29544ae0f83f8e","merge_commit_sha":null,"squash_commit_sha":null,"discussion_locked":null,"should_remove_source_branch":null,"force_remove_source_branch":true,"allow_collaboration":true,"allow_maintainer_to_push":true,"reference":"!21","references":{"short":"!21","relative":"!21","full":"Cogitri/test-project-webhook!21"},"web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/merge_requests/21","time_stats":{"time_estimate":0,"total_time_spent":0,"human_time_estimate":null,"human_total_time_spent":null},"squash":false,"task_completion_status":{"count":0,"completed_count":0},"has_conflicts":false,"blocking_discussions_resolved":true,"approvals_before_merge":null},{"id":63528046,"iid":1,"project_id":19765543,"title":"Test pipeline webhook","description":"","state":"opened","created_at":"2020-07-04T21:17:55.655Z","updated_at":"2020-07-20T09:38:51.115Z","merged_by":null,"merged_at":null,"closed_by":null,"closed_at":null,"target_branch":"master","source_branch":"ci","user_notes_count":1,"upvotes":0,"downvotes":0,"author":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"assignees":[],"assignee":null,"source_project_id":19765543,"target_project_id":19765543,"labels":["status:mr-build-broken","status:mr-stale"],"work_in_progress":false,"milestone":null,"merge_when_pipeline_succeeds":false,"merge_status":"can_be_merged","sha":"b2a971a4b9c295667fc6f78099f120daf3921fca","merge_commit_sha":null,"squash_commit_sha":null,"discussion_locked":null,"should_remove_source_branch":null,"force_remove_source_branch":null,"reference":"!1","references":{"short":"!1","relative":"!1","full":"Cogitri/test-project-webhook!1"},"web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/merge_requests/1","time_stats":{"time_estimate":0,"total_time_spent":0,"human_time_estimate":null,"human_total_time_spent":null},"squash":false,"task_completion_status":{"count":0,"completed_count":0},"has_conflicts":false,"blocking_discussions_resolved":true,"approvals_before_merge":null}]
+< [{"id":63528046,"iid":1,"project_id":19765543,"title":"Draft: Test pipeline webhook","description":"","state":"opened","created_at":"2020-07-04T21:17:55.655Z","updated_at":"2020-07-20T19:58:02.566Z","merged_by":null,"merged_at":null,"closed_by":null,"closed_at":null,"target_branch":"master","source_branch":"ci","user_notes_count":1,"upvotes":0,"downvotes":0,"author":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"assignees":[],"assignee":null,"source_project_id":19765543,"target_project_id":19765543,"labels":["status:mr-stale"],"work_in_progress":true,"milestone":null,"merge_when_pipeline_succeeds":false,"merge_status":"can_be_merged","sha":"6bf1fd5647bc08cc4d350c4ba7b080c38e766c1c","merge_commit_sha":null,"squash_commit_sha":null,"discussion_locked":null,"should_remove_source_branch":null,"force_remove_source_branch":null,"reference":"!1","references":{"short":"!1","relative":"!1","full":"Cogitri/test-project-webhook!1"},"web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/merge_requests/1","time_stats":{"time_estimate":0,"total_time_spent":0,"human_time_estimate":null,"human_total_time_spent":null},"squash":false,"task_completion_status":{"count":0,"completed_count":0},"has_conflicts":false,"blocking_discussions_resolved":true,"approvals_before_merge":null}]
   
-> GET /api/v4/projects/19765543/merge_requests?state=opened&view=simple HTTP/1.1
-> Soup-Debug-Timestamp: 1595237945
-> Soup-Debug: SoupSession 1 (0x555d0d524100), SoupMessage 2 (0x555d0d531290), SoupSocket 1 (0x555d0d94b900)
+> GET /api/v4/projects/19765543/merge_requests?state=opened&updated_before=2020-07-20T19:57:00+0000 HTTP/1.1
+> Soup-Debug-Timestamp: 1595275492
+> Soup-Debug: SoupSession 1 (0x55c5ff881100), SoupMessage 2 (0x55c5ff890290), SoupSocket 1 (0x55c5ffca8900)
 > Host: gitlab.com
 > Accept-Encoding: gzip, deflate
 > Connection: Keep-Alive
   
 < HTTP/1.1 200 OK
-< Soup-Debug-Timestamp: 1595237945
-< Soup-Debug: SoupMessage 2 (0x555d0d531290)
-< Date: Mon, 20 Jul 2020 09:39:04 GMT
+< Soup-Debug-Timestamp: 1595275492
+< Soup-Debug: SoupMessage 2 (0x55c5ff890290)
+< Date: Mon, 20 Jul 2020 20:04:52 GMT
 < Content-Type: application/json
 < Transfer-Encoding: chunked
 < Connection: keep-alive
-< Set-Cookie: __cfduid=dd98156cca13c3463d9acc113223a911e1595237944; expires=Wed, 19-Aug-20 09:39:04 GMT; path=/; domain=.gitlab.com; HttpOnly; SameSite=Lax; Secure
+< Set-Cookie: __cfduid=d4fbcd327f056cbcbf70c70a1f87c9b281595275491; expires=Wed, 19-Aug-20 20:04:51 GMT; path=/; domain=.gitlab.com; HttpOnly; SameSite=Lax; Secure
 < Vary: Accept-Encoding
 < Cache-Control: max-age=0, private, must-revalidate
-< Etag: W/"0d6f06294601a56dd12499b6e9cd019d"
+< Etag: W/"5a997695a9d7cd799ccde1e687a1d0f8"
+< Link: <https://gitlab.com/api/v4/projects/19765543/merge_requests?id=19765543&order_by=created_at&page=1&per_page=20&sort=desc&state=opened&updated_before=2020-07-20T19%3A57%3A00%2B00%3A00&with_labels_details=false&with_merge_status_recheck=false>; rel="first", <https://gitlab.com/api/v4/projects/19765543/merge_requests?id=19765543&order_by=created_at&page=1&per_page=20&sort=desc&state=opened&updated_before=2020-07-20T19%3A57%3A00%2B00%3A00&with_labels_details=false&with_merge_status_recheck=false>; rel="last"
+< Vary: Origin
+< X-Content-Type-Options: nosniff
+< X-Frame-Options: SAMEORIGIN
+< X-Next-Page: 
+< X-Page: 1
+< X-Per-Page: 20
+< X-Prev-Page: 
+< X-Request-Id: Vfs6EyaCpe4
+< X-Runtime: 0.075613
+< X-Total: 1
+< X-Total-Pages: 1
+< Strict-Transport-Security: max-age=31536000
+< Referrer-Policy: strict-origin-when-cross-origin
+< Content-Encoding: gzip
+< RateLimit-Limit: 600
+< RateLimit-Observed: 12
+< RateLimit-Remaining: 588
+< RateLimit-Reset: 1595275551
+< RateLimit-ResetTime: Mon, 20 Jul 2020 20:05:51 GMT
+< GitLab-LB: fe-09-lb-gprd
+< GitLab-SV: localhost
+< CF-Cache-Status: DYNAMIC
+< cf-request-id: 040f6d51e40000c4ae3a2d6200000001
+< Expect-CT: max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+< Server: cloudflare
+< CF-RAY: 5b5f4b2fdc1dc4ae-DUS
+< 
+< [{"id":63768870,"iid":21,"project_id":19765543,"title":"WIP: Ci","description":"","state":"opened","created_at":"2020-07-07T19:10:35.093Z","updated_at":"2020-07-20T19:47:41.306Z","merged_by":null,"merged_at":null,"closed_by":null,"closed_at":null,"target_branch":"master","source_branch":"ci","user_notes_count":8,"upvotes":0,"downvotes":0,"author":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"assignees":[],"assignee":null,"source_project_id":19765591,"target_project_id":19765543,"labels":[],"work_in_progress":true,"milestone":null,"merge_when_pipeline_succeeds":false,"merge_status":"can_be_merged","sha":"17fdc6269fe8d2eded1dbc5cd36e6ac1e907510b","merge_commit_sha":null,"squash_commit_sha":null,"discussion_locked":null,"should_remove_source_branch":null,"force_remove_source_branch":true,"allow_collaboration":true,"allow_maintainer_to_push":true,"reference":"!21","references":{"short":"!21","relative":"!21","full":"Cogitri/test-project-webhook!21"},"web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/merge_requests/21","time_stats":{"time_estimate":0,"total_time_spent":0,"human_time_estimate":null,"human_total_time_spent":null},"squash":false,"task_completion_status":{"count":0,"completed_count":0},"has_conflicts":false,"blocking_discussions_resolved":true,"approvals_before_merge":null}]
+  
+> GET /api/v4/projects/19765543/merge_requests?state=opened&view=simple HTTP/1.1
+> Soup-Debug-Timestamp: 1595275492
+> Soup-Debug: SoupSession 1 (0x55c5ff881100), SoupMessage 3 (0x55c5ff890470), SoupSocket 1 (0x55c5ffca8900)
+> Host: gitlab.com
+> Accept-Encoding: gzip, deflate
+> Connection: Keep-Alive
+  
+< HTTP/1.1 200 OK
+< Soup-Debug-Timestamp: 1595275492
+< Soup-Debug: SoupMessage 3 (0x55c5ff890470)
+< Date: Mon, 20 Jul 2020 20:04:52 GMT
+< Content-Type: application/json
+< Transfer-Encoding: chunked
+< Connection: keep-alive
+< Set-Cookie: __cfduid=d1bc0df618f7b39ada5e46fd64e910c861595275492; expires=Wed, 19-Aug-20 20:04:52 GMT; path=/; domain=.gitlab.com; HttpOnly; SameSite=Lax; Secure
+< Vary: Accept-Encoding
+< Cache-Control: max-age=0, private, must-revalidate
+< Etag: W/"e8dd6ad073bec55ca48da3e94ce83526"
 < Link: <https://gitlab.com/api/v4/projects/19765543/merge_requests?id=19765543&order_by=created_at&page=1&per_page=20&sort=desc&state=opened&view=simple&with_labels_details=false&with_merge_status_recheck=false>; rel="first", <https://gitlab.com/api/v4/projects/19765543/merge_requests?id=19765543&order_by=created_at&page=1&per_page=20&sort=desc&state=opened&view=simple&with_labels_details=false&with_merge_status_recheck=false>; rel="last"
 < Vary: Origin
 < X-Content-Type-Options: nosniff
@@ -67,98 +120,158 @@
 < X-Page: 1
 < X-Per-Page: 20
 < X-Prev-Page: 
-< X-Request-Id: AealzpQMt19
-< X-Runtime: 0.042917
+< X-Request-Id: Kj7V42R3qL8
+< X-Runtime: 0.035227
 < X-Total: 2
 < X-Total-Pages: 1
 < Strict-Transport-Security: max-age=31536000
 < Referrer-Policy: strict-origin-when-cross-origin
 < Content-Encoding: gzip
-< GitLab-LB: fe-08-lb-gprd
-< GitLab-SV: api-14-sv-gprd
+< RateLimit-Limit: 600
+< RateLimit-Observed: 13
+< RateLimit-Remaining: 587
+< RateLimit-Reset: 1595275552
+< RateLimit-ResetTime: Mon, 20 Jul 2020 20:05:52 GMT
+< GitLab-LB: fe-06-lb-gprd
+< GitLab-SV: localhost
 < CF-Cache-Status: DYNAMIC
-< cf-request-id: 040d306595000040bc43175200000001
+< cf-request-id: 040f6d53140000c4ae3a2e8200000001
 < Expect-CT: max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
 < Server: cloudflare
-< CF-RAY: 5b5bb6828f3440bc-HAM
+< CF-RAY: 5b5f4b31b92bc4ae-DUS
 < 
-< [{"id":63768870,"iid":21,"project_id":19765543,"title":"WIP: Ci","description":"","state":"opened","created_at":"2020-07-07T19:10:35.093Z","updated_at":"2020-07-20T09:38:48.088Z","web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/merge_requests/21"},{"id":63528046,"iid":1,"project_id":19765543,"title":"Test pipeline webhook","description":"","state":"opened","created_at":"2020-07-04T21:17:55.655Z","updated_at":"2020-07-20T09:38:51.115Z","web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/merge_requests/1"}]
+< [{"id":63768870,"iid":21,"project_id":19765543,"title":"WIP: Ci","description":"","state":"opened","created_at":"2020-07-07T19:10:35.093Z","updated_at":"2020-07-20T19:47:41.306Z","web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/merge_requests/21"},{"id":63528046,"iid":1,"project_id":19765543,"title":"Draft: Test pipeline webhook","description":"","state":"opened","created_at":"2020-07-04T21:17:55.655Z","updated_at":"2020-07-20T19:58:02.566Z","web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/merge_requests/1"}]
   
 > GET /api/v4/projects/19765543/merge_requests/21 HTTP/1.1
-> Soup-Debug-Timestamp: 1595237945
-> Soup-Debug: SoupSession 1 (0x555d0d524100), SoupMessage 3 (0x555d0d531470), SoupSocket 1 (0x555d0d94b900)
+> Soup-Debug-Timestamp: 1595275492
+> Soup-Debug: SoupSession 1 (0x55c5ff881100), SoupMessage 4 (0x55c5ff890560), SoupSocket 1 (0x55c5ffca8900)
 > Host: gitlab.com
 > Accept-Encoding: gzip, deflate
 > Connection: Keep-Alive
   
 < HTTP/1.1 200 OK
-< Soup-Debug-Timestamp: 1595237946
-< Soup-Debug: SoupMessage 3 (0x555d0d531470)
-< Date: Mon, 20 Jul 2020 09:39:05 GMT
+< Soup-Debug-Timestamp: 1595275493
+< Soup-Debug: SoupMessage 4 (0x55c5ff890560)
+< Date: Mon, 20 Jul 2020 20:04:52 GMT
 < Content-Type: application/json
 < Transfer-Encoding: chunked
 < Connection: keep-alive
-< Set-Cookie: __cfduid=df169cc44797d561098ec55707b44cf1f1595237945; expires=Wed, 19-Aug-20 09:39:05 GMT; path=/; domain=.gitlab.com; HttpOnly; SameSite=Lax; Secure
+< Set-Cookie: __cfduid=d1bc0df618f7b39ada5e46fd64e910c861595275492; expires=Wed, 19-Aug-20 20:04:52 GMT; path=/; domain=.gitlab.com; HttpOnly; SameSite=Lax; Secure
 < Vary: Accept-Encoding
 < Cache-Control: max-age=0, private, must-revalidate
-< Etag: W/"4ae9caf6878a324316a2a8cb3c789010"
+< Etag: W/"7d9bae8b214b1789f4834fb0f8358e8d"
 < Vary: Origin
 < X-Content-Type-Options: nosniff
 < X-Frame-Options: SAMEORIGIN
-< X-Request-Id: adQ8mpH1LI4
-< X-Runtime: 0.076229
+< X-Request-Id: yjvRceOZlI7
+< X-Runtime: 0.081622
 < Strict-Transport-Security: max-age=31536000
 < Referrer-Policy: strict-origin-when-cross-origin
 < Content-Encoding: gzip
-< GitLab-LB: fe-07-lb-gprd
-< GitLab-SV: api-13-sv-gprd
+< RateLimit-Limit: 600
+< RateLimit-Observed: 14
+< RateLimit-Remaining: 586
+< RateLimit-Reset: 1595275552
+< RateLimit-ResetTime: Mon, 20 Jul 2020 20:05:52 GMT
+< GitLab-LB: fe-01-lb-gprd
+< GitLab-SV: localhost
 < CF-Cache-Status: DYNAMIC
-< cf-request-id: 040d3066dc000040bc43180200000001
+< cf-request-id: 040f6d53fa0000c4ae3a2fe200000001
 < Expect-CT: max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
 < Server: cloudflare
-< CF-RAY: 5b5bb684980940bc-HAM
+< CF-RAY: 5b5f4b332e28c4ae-DUS
 < 
-< {"id":63768870,"iid":21,"project_id":19765543,"title":"WIP: Ci","description":"","state":"opened","created_at":"2020-07-07T19:10:35.093Z","updated_at":"2020-07-20T09:38:48.088Z","merged_by":null,"merged_at":null,"closed_by":null,"closed_at":null,"target_branch":"master","source_branch":"ci","user_notes_count":7,"upvotes":0,"downvotes":0,"author":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"assignees":[],"assignee":null,"source_project_id":19765591,"target_project_id":19765543,"labels":["status:mr-build-broken"],"work_in_progress":true,"milestone":null,"merge_when_pipeline_succeeds":false,"merge_status":"can_be_merged","sha":"c6070c1d33751bd3852ed2a2bf29544ae0f83f8e","merge_commit_sha":null,"squash_commit_sha":null,"discussion_locked":null,"should_remove_source_branch":null,"force_remove_source_branch":true,"allow_collaboration":true,"allow_maintainer_to_push":true,"reference":"!21","references":{"short":"!21","relative":"!21","full":"Cogitri/test-project-webhook!21"},"web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/merge_requests/21","time_stats":{"time_estimate":0,"total_time_spent":0,"human_time_estimate":null,"human_total_time_spent":null},"squash":false,"task_completion_status":{"count":0,"completed_count":0},"has_conflicts":false,"blocking_discussions_resolved":true,"approvals_before_merge":null,"subscribed":false,"changes_count":"1","latest_build_started_at":null,"latest_build_finished_at":null,"first_deployed_to_production_at":null,"pipeline":null,"head_pipeline":{"id":164886879,"sha":"c6070c1d33751bd3852ed2a2bf29544ae0f83f8e","ref":"ci","status":"failed","created_at":"2020-07-09T15:44:58.231Z","updated_at":"2020-07-12T17:47:43.949Z","web_url":"https://gitlab.com/temptestgroupforwebhook/test-project-webhook/-/pipelines/164886879","before_sha":"136a0687c1234ad6052b762fd09bbb5fc468322a","tag":false,"yaml_errors":null,"user":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"started_at":"2020-07-09T15:44:59.481Z","finished_at":"2020-07-12T17:47:43.942Z","committed_at":null,"duration":12,"coverage":null,"detailed_status":{"icon":"status_failed","text":"failed","label":"failed","group":"failed","tooltip":"failed","has_details":true,"details_path":"/temptestgroupforwebhook/test-project-webhook/-/pipelines/164886879","illustration":null,"favicon":"https://gitlab.com/assets/ci_favicons/favicon_status_failed-41304d7f7e3828808b0c26771f0309e55296819a9beea3ea9fbf6689d9857c12.png"}},"diff_refs":{"base_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307","head_sha":"c6070c1d33751bd3852ed2a2bf29544ae0f83f8e","start_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307"},"merge_error":null,"first_contribution":false,"user":{"can_merge":false}}
+< {"id":63768870,"iid":21,"project_id":19765543,"title":"WIP: Ci","description":"","state":"opened","created_at":"2020-07-07T19:10:35.093Z","updated_at":"2020-07-20T19:47:41.306Z","merged_by":null,"merged_at":null,"closed_by":null,"closed_at":null,"target_branch":"master","source_branch":"ci","user_notes_count":8,"upvotes":0,"downvotes":0,"author":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"assignees":[],"assignee":null,"source_project_id":19765591,"target_project_id":19765543,"labels":[],"work_in_progress":true,"milestone":null,"merge_when_pipeline_succeeds":false,"merge_status":"can_be_merged","sha":"17fdc6269fe8d2eded1dbc5cd36e6ac1e907510b","merge_commit_sha":null,"squash_commit_sha":null,"discussion_locked":null,"should_remove_source_branch":null,"force_remove_source_branch":true,"allow_collaboration":true,"allow_maintainer_to_push":true,"reference":"!21","references":{"short":"!21","relative":"!21","full":"Cogitri/test-project-webhook!21"},"web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/merge_requests/21","time_stats":{"time_estimate":0,"total_time_spent":0,"human_time_estimate":null,"human_total_time_spent":null},"squash":false,"task_completion_status":{"count":0,"completed_count":0},"has_conflicts":false,"blocking_discussions_resolved":true,"approvals_before_merge":null,"subscribed":false,"changes_count":"1","latest_build_started_at":"2020-07-20T19:06:45.836Z","latest_build_finished_at":"2020-07-20T19:07:01.147Z","first_deployed_to_production_at":null,"pipeline":{"id":168728312,"sha":"17fdc6269fe8d2eded1dbc5cd36e6ac1e907510b","ref":"ci","status":"success","created_at":"2020-07-20T19:06:45.241Z","updated_at":"2020-07-20T19:07:01.154Z","web_url":"https://gitlab.com/temptestgroupforwebhook/test-project-webhook/-/pipelines/168728312"},"head_pipeline":{"id":168728312,"sha":"17fdc6269fe8d2eded1dbc5cd36e6ac1e907510b","ref":"ci","status":"success","created_at":"2020-07-20T19:06:45.241Z","updated_at":"2020-07-20T19:07:01.154Z","web_url":"https://gitlab.com/temptestgroupforwebhook/test-project-webhook/-/pipelines/168728312","before_sha":"c6070c1d33751bd3852ed2a2bf29544ae0f83f8e","tag":false,"yaml_errors":null,"user":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"started_at":"2020-07-20T19:06:45.836Z","finished_at":"2020-07-20T19:07:01.147Z","committed_at":null,"duration":15,"coverage":null,"detailed_status":{"icon":"status_success","text":"passed","label":"passed","group":"success","tooltip":"passed","has_details":true,"details_path":"/temptestgroupforwebhook/test-project-webhook/-/pipelines/168728312","illustration":null,"favicon":"https://gitlab.com/assets/ci_favicons/favicon_status_success-8451333011eee8ce9f2ab25dc487fe24a8758c694827a582f17f42b0a90446a2.png"}},"diff_refs":{"base_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307","head_sha":"17fdc6269fe8d2eded1dbc5cd36e6ac1e907510b","start_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307"},"merge_error":null,"first_contribution":false,"user":{"can_merge":false}}
   
 > GET /api/v4/projects/19765543/merge_requests/1 HTTP/1.1
-> Soup-Debug-Timestamp: 1595237946
-> Soup-Debug: SoupSession 1 (0x555d0d524100), SoupMessage 4 (0x555d0d531470), SoupSocket 1 (0x555d0d94b900)
+> Soup-Debug-Timestamp: 1595275493
+> Soup-Debug: SoupSession 1 (0x55c5ff881100), SoupMessage 5 (0x55c5ff890380), SoupSocket 1 (0x55c5ffca8900)
 > Host: gitlab.com
 > Accept-Encoding: gzip, deflate
 > Connection: Keep-Alive
   
 < HTTP/1.1 200 OK
-< Soup-Debug-Timestamp: 1595237946
-< Soup-Debug: SoupMessage 4 (0x555d0d531470)
-< Date: Mon, 20 Jul 2020 09:39:05 GMT
+< Soup-Debug-Timestamp: 1595275493
+< Soup-Debug: SoupMessage 5 (0x55c5ff890380)
+< Date: Mon, 20 Jul 2020 20:04:53 GMT
 < Content-Type: application/json
 < Transfer-Encoding: chunked
 < Connection: keep-alive
-< Set-Cookie: __cfduid=df169cc44797d561098ec55707b44cf1f1595237945; expires=Wed, 19-Aug-20 09:39:05 GMT; path=/; domain=.gitlab.com; HttpOnly; SameSite=Lax; Secure
+< Set-Cookie: __cfduid=d1bc0df618f7b39ada5e46fd64e910c861595275492; expires=Wed, 19-Aug-20 20:04:52 GMT; path=/; domain=.gitlab.com; HttpOnly; SameSite=Lax; Secure
 < Vary: Accept-Encoding
 < Cache-Control: max-age=0, private, must-revalidate
-< Etag: W/"0cc0df947a51ac3c21ac6b2831d4cc48"
+< Etag: W/"67ddb4e19cabdb3a4ecfcfce3df97726"
 < Vary: Origin
 < X-Content-Type-Options: nosniff
 < X-Frame-Options: SAMEORIGIN
-< X-Request-Id: 7Xb3Z3Gmsc6
-< X-Runtime: 0.073630
+< X-Request-Id: qa68fnYV8d5
+< X-Runtime: 0.085427
 < Strict-Transport-Security: max-age=31536000
 < Referrer-Policy: strict-origin-when-cross-origin
 < Content-Encoding: gzip
-< GitLab-LB: fe-04-lb-gprd
-< GitLab-SV: api-01-sv-gprd
+< RateLimit-Limit: 600
+< RateLimit-Observed: 15
+< RateLimit-Remaining: 585
+< RateLimit-Reset: 1595275552
+< RateLimit-ResetTime: Mon, 20 Jul 2020 20:05:52 GMT
+< GitLab-LB: fe-01-lb-gprd
+< GitLab-SV: localhost
 < CF-Cache-Status: DYNAMIC
-< cf-request-id: 040d3068db000040bc43191200000001
+< cf-request-id: 040f6d55c60000c4ae3a324200000001
 < Expect-CT: max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
 < Server: cloudflare
-< CF-RAY: 5b5bb687c8cc40bc-HAM
+< CF-RAY: 5b5f4b360e11c4ae-DUS
 < 
-< {"id":63528046,"iid":1,"project_id":19765543,"title":"Test pipeline webhook","description":"","state":"opened","created_at":"2020-07-04T21:17:55.655Z","updated_at":"2020-07-20T09:38:51.115Z","merged_by":null,"merged_at":null,"closed_by":null,"closed_at":null,"target_branch":"master","source_branch":"ci","user_notes_count":1,"upvotes":0,"downvotes":0,"author":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"assignees":[],"assignee":null,"source_project_id":19765543,"target_project_id":19765543,"labels":["status:mr-build-broken","status:mr-stale"],"work_in_progress":false,"milestone":null,"merge_when_pipeline_succeeds":false,"merge_status":"can_be_merged","sha":"b2a971a4b9c295667fc6f78099f120daf3921fca","merge_commit_sha":null,"squash_commit_sha":null,"discussion_locked":null,"should_remove_source_branch":null,"force_remove_source_branch":null,"reference":"!1","references":{"short":"!1","relative":"!1","full":"Cogitri/test-project-webhook!1"},"web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/merge_requests/1","time_stats":{"time_estimate":0,"total_time_spent":0,"human_time_estimate":null,"human_total_time_spent":null},"squash":false,"task_completion_status":{"count":0,"completed_count":0},"has_conflicts":false,"blocking_discussions_resolved":true,"approvals_before_merge":null,"subscribed":false,"changes_count":"0","latest_build_started_at":"2020-07-04T21:21:05.495Z","latest_build_finished_at":null,"first_deployed_to_production_at":null,"pipeline":{"id":163146526,"sha":"b2a971a4b9c295667fc6f78099f120daf3921fca","ref":"ci","status":"failed","created_at":"2020-07-04T21:21:04.267Z","updated_at":"2020-07-04T21:23:21.600Z","web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/pipelines/163146526"},"head_pipeline":{"id":163146526,"sha":"b2a971a4b9c295667fc6f78099f120daf3921fca","ref":"ci","status":"failed","created_at":"2020-07-04T21:21:04.267Z","updated_at":"2020-07-04T21:23:21.600Z","web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/pipelines/163146526","before_sha":"3f071ed59c60e738a39c320436e04da3a4de4d33","tag":false,"yaml_errors":null,"user":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"started_at":"2020-07-04T21:21:05.495Z","finished_at":"2020-07-04T21:23:21.595Z","committed_at":null,"duration":7,"coverage":null,"detailed_status":{"icon":"status_failed","text":"failed","label":"failed","group":"failed","tooltip":"failed","has_details":true,"details_path":"/Cogitri/test-project-webhook/-/pipelines/163146526","illustration":null,"favicon":"https://gitlab.com/assets/ci_favicons/favicon_status_failed-41304d7f7e3828808b0c26771f0309e55296819a9beea3ea9fbf6689d9857c12.png"}},"diff_refs":{"base_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307","head_sha":"b2a971a4b9c295667fc6f78099f120daf3921fca","start_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307"},"merge_error":null,"first_contribution":false,"user":{"can_merge":false}}
+< {"id":63528046,"iid":1,"project_id":19765543,"title":"Draft: Test pipeline webhook","description":"","state":"opened","created_at":"2020-07-04T21:17:55.655Z","updated_at":"2020-07-20T19:58:02.566Z","merged_by":null,"merged_at":null,"closed_by":null,"closed_at":null,"target_branch":"master","source_branch":"ci","user_notes_count":1,"upvotes":0,"downvotes":0,"author":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"assignees":[],"assignee":null,"source_project_id":19765543,"target_project_id":19765543,"labels":["status:mr-stale"],"work_in_progress":true,"milestone":null,"merge_when_pipeline_succeeds":false,"merge_status":"can_be_merged","sha":"6bf1fd5647bc08cc4d350c4ba7b080c38e766c1c","merge_commit_sha":null,"squash_commit_sha":null,"discussion_locked":null,"should_remove_source_branch":null,"force_remove_source_branch":null,"reference":"!1","references":{"short":"!1","relative":"!1","full":"Cogitri/test-project-webhook!1"},"web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/merge_requests/1","time_stats":{"time_estimate":0,"total_time_spent":0,"human_time_estimate":null,"human_total_time_spent":null},"squash":false,"task_completion_status":{"count":0,"completed_count":0},"has_conflicts":false,"blocking_discussions_resolved":true,"approvals_before_merge":null,"subscribed":false,"changes_count":"1","latest_build_started_at":"2020-07-20T19:56:38.762Z","latest_build_finished_at":null,"first_deployed_to_production_at":null,"pipeline":{"id":168740566,"sha":"6bf1fd5647bc08cc4d350c4ba7b080c38e766c1c","ref":"ci","status":"failed","created_at":"2020-07-20T19:56:37.971Z","updated_at":"2020-07-20T19:56:54.765Z","web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/pipelines/168740566"},"head_pipeline":{"id":168740566,"sha":"6bf1fd5647bc08cc4d350c4ba7b080c38e766c1c","ref":"ci","status":"failed","created_at":"2020-07-20T19:56:37.971Z","updated_at":"2020-07-20T19:56:54.765Z","web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/pipelines/168740566","before_sha":"07c17fd41075986b8851637962f2053ed54955d4","tag":false,"yaml_errors":null,"user":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"started_at":"2020-07-20T19:56:38.762Z","finished_at":"2020-07-20T19:56:54.760Z","committed_at":null,"duration":15,"coverage":null,"detailed_status":{"icon":"status_failed","text":"failed","label":"failed","group":"failed","tooltip":"failed","has_details":true,"details_path":"/Cogitri/test-project-webhook/-/pipelines/168740566","illustration":null,"favicon":"https://gitlab.com/assets/ci_favicons/favicon_status_failed-41304d7f7e3828808b0c26771f0309e55296819a9beea3ea9fbf6689d9857c12.png"}},"diff_refs":{"base_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307","head_sha":"6bf1fd5647bc08cc4d350c4ba7b080c38e766c1c","start_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307"},"merge_error":null,"first_contribution":false,"user":{"can_merge":false}}
+  
+> PUT /api/v4/projects/19765543/merge_requests/1 HTTP/1.1
+> Soup-Debug-Timestamp: 1595275493
+> Soup-Debug: SoupSession 1 (0x55c5ff881100), SoupMessage 6 (0x55c5ff8901a0), SoupSocket 1 (0x55c5ffca8900)
+> Host: gitlab.com
+> Private-Token: PUTTOKENHERE
+> Content-Type: application/json
+> Accept-Encoding: gzip, deflate
+> Connection: Keep-Alive
+> 
+> {"remove_labels": ["status:mr-stale"]}
+  
+< HTTP/1.1 200 OK
+< Soup-Debug-Timestamp: 1595275493
+< Soup-Debug: SoupMessage 6 (0x55c5ff8901a0)
+< Date: Mon, 20 Jul 2020 20:04:53 GMT
+< Content-Type: application/json
+< Transfer-Encoding: chunked
+< Connection: keep-alive
+< Set-Cookie: __cfduid=dbdaef772d53499dad03ae0fc45017d131595275493; expires=Wed, 19-Aug-20 20:04:53 GMT; path=/; domain=.gitlab.com; HttpOnly; SameSite=Lax; Secure
+< Vary: Accept-Encoding
+< Cache-Control: max-age=0, private, must-revalidate
+< Etag: W/"e473a5f9421194d8a1e582cdbb1b7f4d"
+< Vary: Origin
+< X-Content-Type-Options: nosniff
+< X-Frame-Options: SAMEORIGIN
+< X-Request-Id: snzHvQTXHw4
+< X-Runtime: 0.229384
+< Strict-Transport-Security: max-age=31536000
+< Referrer-Policy: strict-origin-when-cross-origin
+< Content-Encoding: gzip
+< RateLimit-Limit: 600
+< RateLimit-Observed: 16
+< RateLimit-Remaining: 584
+< RateLimit-Reset: 1595275553
+< RateLimit-ResetTime: Mon, 20 Jul 2020 20:05:53 GMT
+< GitLab-LB: fe-12-lb-gprd
+< GitLab-SV: localhost
+< CF-Cache-Status: DYNAMIC
+< cf-request-id: 040f6d56d50000c4ae3a339200000001
+< Expect-CT: max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+< Server: cloudflare
+< CF-RAY: 5b5f4b37bb9fc4ae-DUS
+< 
+< {"id":63528046,"iid":1,"project_id":19765543,"title":"Draft: Test pipeline webhook","description":"","state":"opened","created_at":"2020-07-04T21:17:55.655Z","updated_at":"2020-07-20T20:04:53.223Z","merged_by":null,"merged_at":null,"closed_by":null,"closed_at":null,"target_branch":"master","source_branch":"ci","user_notes_count":1,"upvotes":0,"downvotes":0,"author":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"assignees":[],"assignee":null,"source_project_id":19765543,"target_project_id":19765543,"labels":[],"work_in_progress":true,"milestone":null,"merge_when_pipeline_succeeds":false,"merge_status":"can_be_merged","sha":"6bf1fd5647bc08cc4d350c4ba7b080c38e766c1c","merge_commit_sha":null,"squash_commit_sha":null,"discussion_locked":null,"should_remove_source_branch":null,"force_remove_source_branch":null,"reference":"!1","references":{"short":"!1","relative":"!1","full":"Cogitri/test-project-webhook!1"},"web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/merge_requests/1","time_stats":{"time_estimate":0,"total_time_spent":0,"human_time_estimate":null,"human_total_time_spent":null},"squash":false,"task_completion_status":{"count":0,"completed_count":0},"has_conflicts":false,"blocking_discussions_resolved":true,"approvals_before_merge":null,"subscribed":true,"changes_count":"1","latest_build_started_at":"2020-07-20T19:56:38.762Z","latest_build_finished_at":null,"first_deployed_to_production_at":null,"pipeline":{"id":168740566,"sha":"6bf1fd5647bc08cc4d350c4ba7b080c38e766c1c","ref":"ci","status":"failed","created_at":"2020-07-20T19:56:37.971Z","updated_at":"2020-07-20T19:56:54.765Z","web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/pipelines/168740566"},"head_pipeline":{"id":168740566,"sha":"6bf1fd5647bc08cc4d350c4ba7b080c38e766c1c","ref":"ci","status":"failed","created_at":"2020-07-20T19:56:37.971Z","updated_at":"2020-07-20T19:56:54.765Z","web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/pipelines/168740566","before_sha":"07c17fd41075986b8851637962f2053ed54955d4","tag":false,"yaml_errors":null,"user":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"started_at":"2020-07-20T19:56:38.762Z","finished_at":"2020-07-20T19:56:54.760Z","committed_at":null,"duration":15,"coverage":null,"detailed_status":{"icon":"status_failed","text":"failed","label":"failed","group":"failed","tooltip":"failed","has_details":true,"details_path":"/Cogitri/test-project-webhook/-/pipelines/168740566","illustration":null,"favicon":"https://gitlab.com/assets/ci_favicons/favicon_status_failed-41304d7f7e3828808b0c26771f0309e55296819a9beea3ea9fbf6689d9857c12.png"}},"diff_refs":{"base_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307","head_sha":"6bf1fd5647bc08cc4d350c4ba7b080c38e766c1c","start_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307"},"merge_error":null,"user":{"can_merge":true}}
   
 > POST /api/v4/projects/19765543/merge_requests/21/notes HTTP/1.1
-> Soup-Debug-Timestamp: 1595237946
-> Soup-Debug: SoupSession 1 (0x555d0d524100), SoupMessage 5 (0x555d0d531380), SoupSocket 2 (0x555d0d94b9d0)
+> Soup-Debug-Timestamp: 1595275493
+> Soup-Debug: SoupSession 1 (0x55c5ff881100), SoupMessage 7 (0x55c5ff890380), SoupSocket 2 (0x55c5ffca89d0)
 > Host: gitlab.com
 > Private-Token: PUTTOKENHERE
 > Content-Type: application/json
@@ -168,35 +281,40 @@
 > {"body": "Beep Boop, I'm a bot. I've detected that this merge request hasn't been updated in the last two weeks. It will be closed if no further activity occurs. Thank you for your contributions."}
   
 < HTTP/1.1 201 Created
-< Soup-Debug-Timestamp: 1595237946
-< Soup-Debug: SoupMessage 5 (0x555d0d531380)
-< Date: Mon, 20 Jul 2020 09:39:06 GMT
+< Soup-Debug-Timestamp: 1595275494
+< Soup-Debug: SoupMessage 7 (0x55c5ff890380)
+< Date: Mon, 20 Jul 2020 20:04:53 GMT
 < Content-Type: application/json
 < Content-Length: 691
 < Connection: keep-alive
-< Set-Cookie: __cfduid=d32e97949cbe54826cc455637e1bed0b41595237945; expires=Wed, 19-Aug-20 09:39:05 GMT; path=/; domain=.gitlab.com; HttpOnly; SameSite=Lax; Secure
+< Set-Cookie: __cfduid=d122706a2d0daa421b270b1ed946142e61595275493; expires=Wed, 19-Aug-20 20:04:53 GMT; path=/; domain=.gitlab.com; HttpOnly; SameSite=Lax; Secure
 < Cache-Control: max-age=0, private, must-revalidate
-< Etag: W/"1a341347b4ce86776022419a4e8a8d80"
+< Etag: W/"c0c15424fbc1657ae03c105f79a2f5a0"
 < Vary: Origin
 < X-Content-Type-Options: nosniff
 < X-Frame-Options: SAMEORIGIN
-< X-Request-Id: gW3mNyoABi5
-< X-Runtime: 0.115273
+< X-Request-Id: EMc4tGrsQj9
+< X-Runtime: 0.137324
 < Strict-Transport-Security: max-age=31536000
 < Referrer-Policy: strict-origin-when-cross-origin
-< GitLab-LB: fe-07-lb-gprd
-< GitLab-SV: api-16-sv-gprd
+< RateLimit-Limit: 600
+< RateLimit-Observed: 17
+< RateLimit-Remaining: 583
+< RateLimit-Reset: 1595275553
+< RateLimit-ResetTime: Mon, 20 Jul 2020 20:05:53 GMT
+< GitLab-LB: fe-01-lb-gprd
+< GitLab-SV: localhost
 < CF-Cache-Status: DYNAMIC
-< cf-request-id: 040d306a200000d463939b6200000001
+< cf-request-id: 040f6d588b0000c49a25948200000001
 < Expect-CT: max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
 < Server: cloudflare
-< CF-RAY: 5b5bb689c976d463-HAM
+< CF-RAY: 5b5f4b3a7df2c49a-DUS
 < 
-< {"id":382155180,"type":null,"body":"Beep Boop, I'm a bot. I've detected that this merge request hasn't been updated in the last two weeks. It will be closed if no further activity occurs. Thank you for your contributions.","attachment":null,"author":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"created_at":"2020-07-20T09:39:06.030Z","updated_at":"2020-07-20T09:39:06.030Z","system":false,"noteable_id":63768870,"noteable_type":"MergeRequest","resolvable":false,"confidential":false,"noteable_iid":21,"commands_changes":{}}
+< {"id":382544883,"type":null,"body":"Beep Boop, I'm a bot. I've detected that this merge request hasn't been updated in the last two weeks. It will be closed if no further activity occurs. Thank you for your contributions.","attachment":null,"author":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"created_at":"2020-07-20T20:04:53.687Z","updated_at":"2020-07-20T20:04:53.687Z","system":false,"noteable_id":63768870,"noteable_type":"MergeRequest","resolvable":false,"confidential":false,"noteable_iid":21,"commands_changes":{}}
   
 > PUT /api/v4/projects/19765543/merge_requests/21 HTTP/1.1
-> Soup-Debug-Timestamp: 1595237946
-> Soup-Debug: SoupSession 1 (0x555d0d524100), SoupMessage 6 (0x555d0d5311a0), SoupSocket 2 (0x555d0d94b9d0)
+> Soup-Debug-Timestamp: 1595275494
+> Soup-Debug: SoupSession 1 (0x55c5ff881100), SoupMessage 8 (0x55c5ff890560), SoupSocket 2 (0x55c5ffca89d0)
 > Host: gitlab.com
 > Private-Token: PUTTOKENHERE
 > Content-Type: application/json
@@ -206,117 +324,87 @@
 > {"add_labels": ["status:mr-stale"]}
   
 < HTTP/1.1 200 OK
-< Soup-Debug-Timestamp: 1595237958
-< Soup-Debug: SoupMessage 6 (0x555d0d5311a0)
-< Date: Mon, 20 Jul 2020 09:39:17 GMT
+< Soup-Debug-Timestamp: 1595275494
+< Soup-Debug: SoupMessage 8 (0x55c5ff890560)
+< Date: Mon, 20 Jul 2020 20:04:54 GMT
 < Content-Type: application/json
 < Transfer-Encoding: chunked
 < Connection: keep-alive
-< Set-Cookie: __cfduid=d51303866563defce0fba4033037a215a1595237946; expires=Wed, 19-Aug-20 09:39:06 GMT; path=/; domain=.gitlab.com; HttpOnly; SameSite=Lax; Secure
+< Set-Cookie: __cfduid=d122706a2d0daa421b270b1ed946142e61595275493; expires=Wed, 19-Aug-20 20:04:53 GMT; path=/; domain=.gitlab.com; HttpOnly; SameSite=Lax; Secure
 < Vary: Accept-Encoding
 < Cache-Control: max-age=0, private, must-revalidate
-< Etag: W/"ae44f77939b46a2e25070ada497835d2"
+< Etag: W/"c27fc1f02fcd5939a812163f26285f29"
 < Vary: Origin
 < X-Content-Type-Options: nosniff
 < X-Frame-Options: SAMEORIGIN
-< X-Request-Id: jZLnLP3odX7
-< X-Runtime: 11.618073
+< X-Request-Id: F9dwX3nOD4
+< X-Runtime: 0.264732
 < Strict-Transport-Security: max-age=31536000
 < Referrer-Policy: strict-origin-when-cross-origin
 < Content-Encoding: gzip
+< RateLimit-Limit: 600
+< RateLimit-Observed: 18
+< RateLimit-Remaining: 582
+< RateLimit-Reset: 1595275554
+< RateLimit-ResetTime: Mon, 20 Jul 2020 20:05:54 GMT
 < GitLab-LB: fe-10-lb-gprd
-< GitLab-SV: api-07-sv-gprd
+< GitLab-SV: localhost
 < CF-Cache-Status: DYNAMIC
-< cf-request-id: 040d306b360000d463939bc200000001
+< cf-request-id: 040f6d59ec0000c49a25983200000001
 < Expect-CT: max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
 < Server: cloudflare
-< CF-RAY: 5b5bb68b8c06d463-HAM
+< CF-RAY: 5b5f4b3cac6ec49a-DUS
 < 
-< {"id":63768870,"iid":21,"project_id":19765543,"title":"WIP: Ci","description":"","state":"opened","created_at":"2020-07-07T19:10:35.093Z","updated_at":"2020-07-20T09:38:48.088Z","merged_by":null,"merged_at":null,"closed_by":null,"closed_at":null,"target_branch":"master","source_branch":"ci","user_notes_count":8,"upvotes":0,"downvotes":0,"author":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"assignees":[],"assignee":null,"source_project_id":19765591,"target_project_id":19765543,"labels":["status:mr-build-broken","status:mr-stale"],"work_in_progress":true,"milestone":null,"merge_when_pipeline_succeeds":false,"merge_status":"can_be_merged","sha":"c6070c1d33751bd3852ed2a2bf29544ae0f83f8e","merge_commit_sha":null,"squash_commit_sha":null,"discussion_locked":null,"should_remove_source_branch":null,"force_remove_source_branch":true,"allow_collaboration":true,"allow_maintainer_to_push":true,"reference":"!21","references":{"short":"!21","relative":"!21","full":"Cogitri/test-project-webhook!21"},"web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/merge_requests/21","time_stats":{"time_estimate":0,"total_time_spent":0,"human_time_estimate":null,"human_total_time_spent":null},"squash":false,"task_completion_status":{"count":0,"completed_count":0},"has_conflicts":false,"blocking_discussions_resolved":true,"approvals_before_merge":null,"subscribed":true,"changes_count":"1","latest_build_started_at":null,"latest_build_finished_at":null,"first_deployed_to_production_at":null,"pipeline":null,"head_pipeline":{"id":164886879,"sha":"c6070c1d33751bd3852ed2a2bf29544ae0f83f8e","ref":"ci","status":"failed","created_at":"2020-07-09T15:44:58.231Z","updated_at":"2020-07-12T17:47:43.949Z","web_url":"https://gitlab.com/temptestgroupforwebhook/test-project-webhook/-/pipelines/164886879","before_sha":"136a0687c1234ad6052b762fd09bbb5fc468322a","tag":false,"yaml_errors":null,"user":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"started_at":"2020-07-09T15:44:59.481Z","finished_at":"2020-07-12T17:47:43.942Z","committed_at":null,"duration":12,"coverage":null,"detailed_status":{"icon":"status_failed","text":"failed","label":"failed","group":"failed","tooltip":"failed","has_details":true,"details_path":"/temptestgroupforwebhook/test-project-webhook/-/pipelines/164886879","illustration":null,"favicon":"https://gitlab.com/assets/ci_favicons/favicon_status_failed-41304d7f7e3828808b0c26771f0309e55296819a9beea3ea9fbf6689d9857c12.png"}},"diff_refs":{"base_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307","head_sha":"c6070c1d33751bd3852ed2a2bf29544ae0f83f8e","start_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307"},"merge_error":null,"user":{"can_merge":true}}
-  
-> PUT /api/v4/projects/19765543/merge_requests/1 HTTP/1.1
-> Soup-Debug-Timestamp: 1595237958
-> Soup-Debug: SoupSession 1 (0x555d0d524100), SoupMessage 7 (0x555d0d531290), SoupSocket 2 (0x555d0d94b9d0)
-> Host: gitlab.com
-> Private-Token: PUTTOKENHERE
-> Content-Type: application/json
-> Accept-Encoding: gzip, deflate
-> Connection: Keep-Alive
-> 
-> {"state_event": "close"}
-  
-< HTTP/1.1 200 OK
-< Soup-Debug-Timestamp: 1595237969
-< Soup-Debug: SoupMessage 7 (0x555d0d531290)
-< Date: Mon, 20 Jul 2020 09:39:28 GMT
-< Content-Type: application/json
-< Transfer-Encoding: chunked
-< Connection: keep-alive
-< Set-Cookie: __cfduid=db51a376dc228b949e9df0cc82b7f7ec11595237958; expires=Wed, 19-Aug-20 09:39:18 GMT; path=/; domain=.gitlab.com; HttpOnly; SameSite=Lax; Secure
-< Vary: Accept-Encoding
-< Cache-Control: max-age=0, private, must-revalidate
-< Etag: W/"d4597b06956f39a42fee81a1b5bb8d0d"
-< Vary: Origin
-< X-Content-Type-Options: nosniff
-< X-Frame-Options: SAMEORIGIN
-< X-Request-Id: RLWZl9F3fv7
-< X-Runtime: 10.808435
-< Strict-Transport-Security: max-age=31536000
-< Referrer-Policy: strict-origin-when-cross-origin
-< Content-Encoding: gzip
-< GitLab-LB: fe-09-lb-gprd
-< GitLab-SV: api-15-sv-gprd
-< CF-Cache-Status: DYNAMIC
-< cf-request-id: 040d30999e0000d46393bc7200000001
-< Expect-CT: max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
-< Server: cloudflare
-< CF-RAY: 5b5bb6d5c8c4d463-HAM
-< 
-< {"id":63528046,"iid":1,"project_id":19765543,"title":"Test pipeline webhook","description":"","state":"closed","created_at":"2020-07-04T21:17:55.655Z","updated_at":"2020-07-20T09:39:18.303Z","merged_by":null,"merged_at":null,"closed_by":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"closed_at":"2020-07-20T09:39:18.326Z","target_branch":"master","source_branch":"ci","user_notes_count":1,"upvotes":0,"downvotes":0,"author":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"assignees":[],"assignee":null,"source_project_id":19765543,"target_project_id":19765543,"labels":["status:mr-build-broken","status:mr-stale"],"work_in_progress":false,"milestone":null,"merge_when_pipeline_succeeds":false,"merge_status":"can_be_merged","sha":"b2a971a4b9c295667fc6f78099f120daf3921fca","merge_commit_sha":null,"squash_commit_sha":null,"discussion_locked":null,"should_remove_source_branch":null,"force_remove_source_branch":null,"reference":"!1","references":{"short":"!1","relative":"!1","full":"Cogitri/test-project-webhook!1"},"web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/merge_requests/1","time_stats":{"time_estimate":0,"total_time_spent":0,"human_time_estimate":null,"human_total_time_spent":null},"squash":false,"task_completion_status":{"count":0,"completed_count":0},"has_conflicts":false,"blocking_discussions_resolved":true,"approvals_before_merge":null,"subscribed":true,"changes_count":"0","latest_build_started_at":"2020-07-04T21:21:05.495Z","latest_build_finished_at":null,"first_deployed_to_production_at":null,"pipeline":{"id":163146526,"sha":"b2a971a4b9c295667fc6f78099f120daf3921fca","ref":"ci","status":"failed","created_at":"2020-07-04T21:21:04.267Z","updated_at":"2020-07-04T21:23:21.600Z","web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/pipelines/163146526"},"head_pipeline":{"id":163146526,"sha":"b2a971a4b9c295667fc6f78099f120daf3921fca","ref":"ci","status":"failed","created_at":"2020-07-04T21:21:04.267Z","updated_at":"2020-07-04T21:23:21.600Z","web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/pipelines/163146526","before_sha":"3f071ed59c60e738a39c320436e04da3a4de4d33","tag":false,"yaml_errors":null,"user":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"started_at":"2020-07-04T21:21:05.495Z","finished_at":"2020-07-04T21:23:21.595Z","committed_at":null,"duration":7,"coverage":null,"detailed_status":{"icon":"status_failed","text":"failed","label":"failed","group":"failed","tooltip":"failed","has_details":true,"details_path":"/Cogitri/test-project-webhook/-/pipelines/163146526","illustration":null,"favicon":"https://gitlab.com/assets/ci_favicons/favicon_status_failed-41304d7f7e3828808b0c26771f0309e55296819a9beea3ea9fbf6689d9857c12.png"}},"diff_refs":{"base_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307","head_sha":"b2a971a4b9c295667fc6f78099f120daf3921fca","start_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307"},"merge_error":null,"user":{"can_merge":true}}
+< {"id":63768870,"iid":21,"project_id":19765543,"title":"WIP: Ci","description":"","state":"opened","created_at":"2020-07-07T19:10:35.093Z","updated_at":"2020-07-20T20:04:53.708Z","merged_by":null,"merged_at":null,"closed_by":null,"closed_at":null,"target_branch":"master","source_branch":"ci","user_notes_count":9,"upvotes":0,"downvotes":0,"author":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"assignees":[],"assignee":null,"source_project_id":19765591,"target_project_id":19765543,"labels":["status:mr-stale"],"work_in_progress":true,"milestone":null,"merge_when_pipeline_succeeds":false,"merge_status":"can_be_merged","sha":"17fdc6269fe8d2eded1dbc5cd36e6ac1e907510b","merge_commit_sha":null,"squash_commit_sha":null,"discussion_locked":null,"should_remove_source_branch":null,"force_remove_source_branch":true,"allow_collaboration":true,"allow_maintainer_to_push":true,"reference":"!21","references":{"short":"!21","relative":"!21","full":"Cogitri/test-project-webhook!21"},"web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/merge_requests/21","time_stats":{"time_estimate":0,"total_time_spent":0,"human_time_estimate":null,"human_total_time_spent":null},"squash":false,"task_completion_status":{"count":0,"completed_count":0},"has_conflicts":false,"blocking_discussions_resolved":true,"approvals_before_merge":null,"subscribed":true,"changes_count":"1","latest_build_started_at":"2020-07-20T19:06:45.836Z","latest_build_finished_at":"2020-07-20T19:07:01.147Z","first_deployed_to_production_at":null,"pipeline":{"id":168728312,"sha":"17fdc6269fe8d2eded1dbc5cd36e6ac1e907510b","ref":"ci","status":"success","created_at":"2020-07-20T19:06:45.241Z","updated_at":"2020-07-20T19:07:01.154Z","web_url":"https://gitlab.com/temptestgroupforwebhook/test-project-webhook/-/pipelines/168728312"},"head_pipeline":{"id":168728312,"sha":"17fdc6269fe8d2eded1dbc5cd36e6ac1e907510b","ref":"ci","status":"success","created_at":"2020-07-20T19:06:45.241Z","updated_at":"2020-07-20T19:07:01.154Z","web_url":"https://gitlab.com/temptestgroupforwebhook/test-project-webhook/-/pipelines/168728312","before_sha":"c6070c1d33751bd3852ed2a2bf29544ae0f83f8e","tag":false,"yaml_errors":null,"user":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"started_at":"2020-07-20T19:06:45.836Z","finished_at":"2020-07-20T19:07:01.147Z","committed_at":null,"duration":15,"coverage":null,"detailed_status":{"icon":"status_success","text":"passed","label":"passed","group":"success","tooltip":"passed","has_details":true,"details_path":"/temptestgroupforwebhook/test-project-webhook/-/pipelines/168728312","illustration":null,"favicon":"https://gitlab.com/assets/ci_favicons/favicon_status_success-8451333011eee8ce9f2ab25dc487fe24a8758c694827a582f17f42b0a90446a2.png"}},"diff_refs":{"base_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307","head_sha":"17fdc6269fe8d2eded1dbc5cd36e6ac1e907510b","start_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307"},"merge_error":null,"user":{"can_merge":true}}
   
 > PUT /api/v4/projects/19765543/merge_requests/21 HTTP/1.1
-> Soup-Debug-Timestamp: 1595237969
-> Soup-Debug: SoupSession 1 (0x555d0d524100), SoupMessage 8 (0x555d0d531560), SoupSocket 2 (0x555d0d94b9d0)
+> Soup-Debug-Timestamp: 1595275494
+> Soup-Debug: SoupSession 1 (0x55c5ff881100), SoupMessage 9 (0x55c5ff890380), SoupSocket 2 (0x55c5ffca89d0)
 > Host: gitlab.com
 > Private-Token: PUTTOKENHERE
 > Content-Type: application/json
 > Accept-Encoding: gzip, deflate
 > Connection: Keep-Alive
 > 
-> {"add_labels": ["status:mr-build-broken"]}
+> {"remove_labels": ["status:mr-build-broken"]}
   
 < HTTP/1.1 200 OK
-< Soup-Debug-Timestamp: 1595237970
-< Soup-Debug: SoupMessage 8 (0x555d0d531560)
-< Date: Mon, 20 Jul 2020 09:39:29 GMT
+< Soup-Debug-Timestamp: 1595275495
+< Soup-Debug: SoupMessage 9 (0x55c5ff890380)
+< Date: Mon, 20 Jul 2020 20:04:54 GMT
 < Content-Type: application/json
 < Transfer-Encoding: chunked
 < Connection: keep-alive
-< Set-Cookie: __cfduid=d427283a07b7c24a9dc0b9018c6ded9331595237969; expires=Wed, 19-Aug-20 09:39:29 GMT; path=/; domain=.gitlab.com; HttpOnly; SameSite=Lax; Secure
+< Set-Cookie: __cfduid=d2b810377efd85bfa61d7c610f08367d81595275494; expires=Wed, 19-Aug-20 20:04:54 GMT; path=/; domain=.gitlab.com; HttpOnly; SameSite=Lax; Secure
 < Vary: Accept-Encoding
 < Cache-Control: max-age=0, private, must-revalidate
-< Etag: W/"ae44f77939b46a2e25070ada497835d2"
+< Etag: W/"c27fc1f02fcd5939a812163f26285f29"
 < Vary: Origin
 < X-Content-Type-Options: nosniff
 < X-Frame-Options: SAMEORIGIN
-< X-Request-Id: a4wPnho0DQ
-< X-Runtime: 0.166569
+< X-Request-Id: M0TQklsgZ0a
+< X-Runtime: 0.180941
 < Strict-Transport-Security: max-age=31536000
 < Referrer-Policy: strict-origin-when-cross-origin
 < Content-Encoding: gzip
-< GitLab-LB: fe-06-lb-gprd
-< GitLab-SV: api-03-sv-gprd
+< RateLimit-Limit: 600
+< RateLimit-Observed: 17
+< RateLimit-Remaining: 582
+< RateLimit-Reset: 1595275554
+< RateLimit-ResetTime: Mon, 20 Jul 2020 20:05:54 GMT
+< GitLab-LB: fe-12-lb-gprd
+< GitLab-SV: localhost
 < CF-Cache-Status: DYNAMIC
-< cf-request-id: 040d30c4c70000d463939ca200000001
+< cf-request-id: 040f6d5bc60000c49a259cc200000001
 < Expect-CT: max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
 < Server: cloudflare
-< CF-RAY: 5b5bb71adc5bd463-HAM
+< CF-RAY: 5b5f4b3faddfc49a-DUS
 < 
-< {"id":63768870,"iid":21,"project_id":19765543,"title":"WIP: Ci","description":"","state":"opened","created_at":"2020-07-07T19:10:35.093Z","updated_at":"2020-07-20T09:38:48.088Z","merged_by":null,"merged_at":null,"closed_by":null,"closed_at":null,"target_branch":"master","source_branch":"ci","user_notes_count":8,"upvotes":0,"downvotes":0,"author":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"assignees":[],"assignee":null,"source_project_id":19765591,"target_project_id":19765543,"labels":["status:mr-build-broken","status:mr-stale"],"work_in_progress":true,"milestone":null,"merge_when_pipeline_succeeds":false,"merge_status":"can_be_merged","sha":"c6070c1d33751bd3852ed2a2bf29544ae0f83f8e","merge_commit_sha":null,"squash_commit_sha":null,"discussion_locked":null,"should_remove_source_branch":null,"force_remove_source_branch":true,"allow_collaboration":true,"allow_maintainer_to_push":true,"reference":"!21","references":{"short":"!21","relative":"!21","full":"Cogitri/test-project-webhook!21"},"web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/merge_requests/21","time_stats":{"time_estimate":0,"total_time_spent":0,"human_time_estimate":null,"human_total_time_spent":null},"squash":false,"task_completion_status":{"count":0,"completed_count":0},"has_conflicts":false,"blocking_discussions_resolved":true,"approvals_before_merge":null,"subscribed":true,"changes_count":"1","latest_build_started_at":null,"latest_build_finished_at":null,"first_deployed_to_production_at":null,"pipeline":null,"head_pipeline":{"id":164886879,"sha":"c6070c1d33751bd3852ed2a2bf29544ae0f83f8e","ref":"ci","status":"failed","created_at":"2020-07-09T15:44:58.231Z","updated_at":"2020-07-12T17:47:43.949Z","web_url":"https://gitlab.com/temptestgroupforwebhook/test-project-webhook/-/pipelines/164886879","before_sha":"136a0687c1234ad6052b762fd09bbb5fc468322a","tag":false,"yaml_errors":null,"user":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"started_at":"2020-07-09T15:44:59.481Z","finished_at":"2020-07-12T17:47:43.942Z","committed_at":null,"duration":12,"coverage":null,"detailed_status":{"icon":"status_failed","text":"failed","label":"failed","group":"failed","tooltip":"failed","has_details":true,"details_path":"/temptestgroupforwebhook/test-project-webhook/-/pipelines/164886879","illustration":null,"favicon":"https://gitlab.com/assets/ci_favicons/favicon_status_failed-41304d7f7e3828808b0c26771f0309e55296819a9beea3ea9fbf6689d9857c12.png"}},"diff_refs":{"base_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307","head_sha":"c6070c1d33751bd3852ed2a2bf29544ae0f83f8e","start_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307"},"merge_error":null,"user":{"can_merge":true}}
+< {"id":63768870,"iid":21,"project_id":19765543,"title":"WIP: Ci","description":"","state":"opened","created_at":"2020-07-07T19:10:35.093Z","updated_at":"2020-07-20T20:04:53.708Z","merged_by":null,"merged_at":null,"closed_by":null,"closed_at":null,"target_branch":"master","source_branch":"ci","user_notes_count":9,"upvotes":0,"downvotes":0,"author":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"assignees":[],"assignee":null,"source_project_id":19765591,"target_project_id":19765543,"labels":["status:mr-stale"],"work_in_progress":true,"milestone":null,"merge_when_pipeline_succeeds":false,"merge_status":"can_be_merged","sha":"17fdc6269fe8d2eded1dbc5cd36e6ac1e907510b","merge_commit_sha":null,"squash_commit_sha":null,"discussion_locked":null,"should_remove_source_branch":null,"force_remove_source_branch":true,"allow_collaboration":true,"allow_maintainer_to_push":true,"reference":"!21","references":{"short":"!21","relative":"!21","full":"Cogitri/test-project-webhook!21"},"web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/merge_requests/21","time_stats":{"time_estimate":0,"total_time_spent":0,"human_time_estimate":null,"human_total_time_spent":null},"squash":false,"task_completion_status":{"count":0,"completed_count":0},"has_conflicts":false,"blocking_discussions_resolved":true,"approvals_before_merge":null,"subscribed":true,"changes_count":"1","latest_build_started_at":"2020-07-20T19:06:45.836Z","latest_build_finished_at":"2020-07-20T19:07:01.147Z","first_deployed_to_production_at":null,"pipeline":{"id":168728312,"sha":"17fdc6269fe8d2eded1dbc5cd36e6ac1e907510b","ref":"ci","status":"success","created_at":"2020-07-20T19:06:45.241Z","updated_at":"2020-07-20T19:07:01.154Z","web_url":"https://gitlab.com/temptestgroupforwebhook/test-project-webhook/-/pipelines/168728312"},"head_pipeline":{"id":168728312,"sha":"17fdc6269fe8d2eded1dbc5cd36e6ac1e907510b","ref":"ci","status":"success","created_at":"2020-07-20T19:06:45.241Z","updated_at":"2020-07-20T19:07:01.154Z","web_url":"https://gitlab.com/temptestgroupforwebhook/test-project-webhook/-/pipelines/168728312","before_sha":"c6070c1d33751bd3852ed2a2bf29544ae0f83f8e","tag":false,"yaml_errors":null,"user":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"started_at":"2020-07-20T19:06:45.836Z","finished_at":"2020-07-20T19:07:01.147Z","committed_at":null,"duration":15,"coverage":null,"detailed_status":{"icon":"status_success","text":"passed","label":"passed","group":"success","tooltip":"passed","has_details":true,"details_path":"/temptestgroupforwebhook/test-project-webhook/-/pipelines/168728312","illustration":null,"favicon":"https://gitlab.com/assets/ci_favicons/favicon_status_success-8451333011eee8ce9f2ab25dc487fe24a8758c694827a582f17f42b0a90446a2.png"}},"diff_refs":{"base_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307","head_sha":"17fdc6269fe8d2eded1dbc5cd36e6ac1e907510b","start_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307"},"merge_error":null,"user":{"can_merge":true}}
   
 > PUT /api/v4/projects/19765543/merge_requests/1 HTTP/1.1
-> Soup-Debug-Timestamp: 1595237970
-> Soup-Debug: SoupSession 1 (0x555d0d524100), SoupMessage 9 (0x555d0d531470), SoupSocket 2 (0x555d0d94b9d0)
+> Soup-Debug-Timestamp: 1595275495
+> Soup-Debug: SoupSession 1 (0x55c5ff881100), SoupMessage 10 (0x55c5ff890290), SoupSocket 2 (0x55c5ffca89d0)
 > Host: gitlab.com
 > Private-Token: PUTTOKENHERE
 > Content-Type: application/json
@@ -326,31 +414,36 @@
 > {"add_labels": ["status:mr-build-broken"]}
   
 < HTTP/1.1 200 OK
-< Soup-Debug-Timestamp: 1595237970
-< Soup-Debug: SoupMessage 9 (0x555d0d531470)
-< Date: Mon, 20 Jul 2020 09:39:29 GMT
+< Soup-Debug-Timestamp: 1595275495
+< Soup-Debug: SoupMessage 10 (0x55c5ff890290)
+< Date: Mon, 20 Jul 2020 20:04:55 GMT
 < Content-Type: application/json
 < Transfer-Encoding: chunked
 < Connection: keep-alive
-< Set-Cookie: __cfduid=d427283a07b7c24a9dc0b9018c6ded9331595237969; expires=Wed, 19-Aug-20 09:39:29 GMT; path=/; domain=.gitlab.com; HttpOnly; SameSite=Lax; Secure
+< Set-Cookie: __cfduid=d2b810377efd85bfa61d7c610f08367d81595275494; expires=Wed, 19-Aug-20 20:04:54 GMT; path=/; domain=.gitlab.com; HttpOnly; SameSite=Lax; Secure
 < Vary: Accept-Encoding
 < Cache-Control: max-age=0, private, must-revalidate
-< Etag: W/"d4597b06956f39a42fee81a1b5bb8d0d"
+< Etag: W/"29306d779d2066eba26043dfcc13f196"
 < Vary: Origin
 < X-Content-Type-Options: nosniff
 < X-Frame-Options: SAMEORIGIN
-< X-Request-Id: TSQXILRgZP2
-< X-Runtime: 0.146947
+< X-Request-Id: zbs2BJeqna
+< X-Runtime: 0.217041
 < Strict-Transport-Security: max-age=31536000
 < Referrer-Policy: strict-origin-when-cross-origin
 < Content-Encoding: gzip
-< GitLab-LB: fe-02-lb-gprd
-< GitLab-SV: api-11-sv-gprd
+< RateLimit-Limit: 600
+< RateLimit-Observed: 18
+< RateLimit-Remaining: 582
+< RateLimit-Reset: 1595275554
+< RateLimit-ResetTime: Mon, 20 Jul 2020 20:05:54 GMT
+< GitLab-LB: fe-03-lb-gprd
+< GitLab-SV: localhost
 < CF-Cache-Status: DYNAMIC
-< cf-request-id: 040d30c6140000d463939d5200000001
+< cf-request-id: 040f6d5d1e0000c49a25a01200000001
 < Expect-CT: max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
 < Server: cloudflare
-< CF-RAY: 5b5bb71cef16d463-HAM
+< CF-RAY: 5b5f4b41cbf4c49a-DUS
 < 
-< {"id":63528046,"iid":1,"project_id":19765543,"title":"Test pipeline webhook","description":"","state":"closed","created_at":"2020-07-04T21:17:55.655Z","updated_at":"2020-07-20T09:39:18.303Z","merged_by":null,"merged_at":null,"closed_by":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"closed_at":"2020-07-20T09:39:18.326Z","target_branch":"master","source_branch":"ci","user_notes_count":1,"upvotes":0,"downvotes":0,"author":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"assignees":[],"assignee":null,"source_project_id":19765543,"target_project_id":19765543,"labels":["status:mr-build-broken","status:mr-stale"],"work_in_progress":false,"milestone":null,"merge_when_pipeline_succeeds":false,"merge_status":"can_be_merged","sha":"b2a971a4b9c295667fc6f78099f120daf3921fca","merge_commit_sha":null,"squash_commit_sha":null,"discussion_locked":null,"should_remove_source_branch":null,"force_remove_source_branch":null,"reference":"!1","references":{"short":"!1","relative":"!1","full":"Cogitri/test-project-webhook!1"},"web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/merge_requests/1","time_stats":{"time_estimate":0,"total_time_spent":0,"human_time_estimate":null,"human_total_time_spent":null},"squash":false,"task_completion_status":{"count":0,"completed_count":0},"has_conflicts":false,"blocking_discussions_resolved":true,"approvals_before_merge":null,"subscribed":true,"changes_count":"0","latest_build_started_at":"2020-07-04T21:21:05.495Z","latest_build_finished_at":null,"first_deployed_to_production_at":null,"pipeline":{"id":163146526,"sha":"b2a971a4b9c295667fc6f78099f120daf3921fca","ref":"ci","status":"failed","created_at":"2020-07-04T21:21:04.267Z","updated_at":"2020-07-04T21:23:21.600Z","web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/pipelines/163146526"},"head_pipeline":{"id":163146526,"sha":"b2a971a4b9c295667fc6f78099f120daf3921fca","ref":"ci","status":"failed","created_at":"2020-07-04T21:21:04.267Z","updated_at":"2020-07-04T21:23:21.600Z","web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/pipelines/163146526","before_sha":"3f071ed59c60e738a39c320436e04da3a4de4d33","tag":false,"yaml_errors":null,"user":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"started_at":"2020-07-04T21:21:05.495Z","finished_at":"2020-07-04T21:23:21.595Z","committed_at":null,"duration":7,"coverage":null,"detailed_status":{"icon":"status_failed","text":"failed","label":"failed","group":"failed","tooltip":"failed","has_details":true,"details_path":"/Cogitri/test-project-webhook/-/pipelines/163146526","illustration":null,"favicon":"https://gitlab.com/assets/ci_favicons/favicon_status_failed-41304d7f7e3828808b0c26771f0309e55296819a9beea3ea9fbf6689d9857c12.png"}},"diff_refs":{"base_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307","head_sha":"b2a971a4b9c295667fc6f78099f120daf3921fca","start_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307"},"merge_error":null,"user":{"can_merge":true}}
+< {"id":63528046,"iid":1,"project_id":19765543,"title":"Draft: Test pipeline webhook","description":"","state":"opened","created_at":"2020-07-04T21:17:55.655Z","updated_at":"2020-07-20T20:04:53.223Z","merged_by":null,"merged_at":null,"closed_by":null,"closed_at":null,"target_branch":"master","source_branch":"ci","user_notes_count":1,"upvotes":0,"downvotes":0,"author":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"assignees":[],"assignee":null,"source_project_id":19765543,"target_project_id":19765543,"labels":["status:mr-build-broken"],"work_in_progress":true,"milestone":null,"merge_when_pipeline_succeeds":false,"merge_status":"can_be_merged","sha":"6bf1fd5647bc08cc4d350c4ba7b080c38e766c1c","merge_commit_sha":null,"squash_commit_sha":null,"discussion_locked":null,"should_remove_source_branch":null,"force_remove_source_branch":null,"reference":"!1","references":{"short":"!1","relative":"!1","full":"Cogitri/test-project-webhook!1"},"web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/merge_requests/1","time_stats":{"time_estimate":0,"total_time_spent":0,"human_time_estimate":null,"human_total_time_spent":null},"squash":false,"task_completion_status":{"count":0,"completed_count":0},"has_conflicts":false,"blocking_discussions_resolved":true,"approvals_before_merge":null,"subscribed":true,"changes_count":"1","latest_build_started_at":"2020-07-20T19:56:38.762Z","latest_build_finished_at":null,"first_deployed_to_production_at":null,"pipeline":{"id":168740566,"sha":"6bf1fd5647bc08cc4d350c4ba7b080c38e766c1c","ref":"ci","status":"failed","created_at":"2020-07-20T19:56:37.971Z","updated_at":"2020-07-20T19:56:54.765Z","web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/pipelines/168740566"},"head_pipeline":{"id":168740566,"sha":"6bf1fd5647bc08cc4d350c4ba7b080c38e766c1c","ref":"ci","status":"failed","created_at":"2020-07-20T19:56:37.971Z","updated_at":"2020-07-20T19:56:54.765Z","web_url":"https://gitlab.com/Cogitri/test-project-webhook/-/pipelines/168740566","before_sha":"07c17fd41075986b8851637962f2053ed54955d4","tag":false,"yaml_errors":null,"user":{"id":2263088,"name":"Rasmus Thomsen","username":"Cogitri","state":"active","avatar_url":"https://assets.gitlab-static.net/uploads/-/system/user/avatar/2263088/avatar.png","web_url":"https://gitlab.com/Cogitri"},"started_at":"2020-07-20T19:56:38.762Z","finished_at":"2020-07-20T19:56:54.760Z","committed_at":null,"duration":15,"coverage":null,"detailed_status":{"icon":"status_failed","text":"failed","label":"failed","group":"failed","tooltip":"failed","has_details":true,"details_path":"/Cogitri/test-project-webhook/-/pipelines/168740566","illustration":null,"favicon":"https://gitlab.com/assets/ci_favicons/favicon_status_failed-41304d7f7e3828808b0c26771f0309e55296819a9beea3ea9fbf6689d9857c12.png"}},"diff_refs":{"base_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307","head_sha":"6bf1fd5647bc08cc4d350c4ba7b080c38e766c1c","start_sha":"02c1e09117585f7fc73d3c5ccd4c2d6700bbd307"},"merge_error":null,"user":{"can_merge":true}}
   

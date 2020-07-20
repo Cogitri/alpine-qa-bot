@@ -8,13 +8,14 @@ namespace AlpineQaBot {
         public Gee.ArrayList<Job> poll (uint project_id, Soup.Session? default_soup_session = null, string db_dir = Config.SHARED_STATE_DIR) throws DatabaseError {
             Gee.ArrayList<Job> res = new Gee.ArrayList<Job>();
 
-            res.add_all (this.poll_stale_merge_requests (project_id, default_soup_session, db_dir) ?? new Gee.ArrayList<Job>());
+            res.add_all (this.poll_active_merge_requests (project_id, default_soup_session) ?? new Gee.ArrayList<Job>());
+            res.add_all (this.poll_stale_merge_requests (project_id, default_soup_session) ?? new Gee.ArrayList<Job>());
             res.add_all (this.poll_failed_merge_requests (project_id, default_soup_session, db_dir) ?? new Gee.ArrayList<Job>());
 
             return res;
         }
 
-        protected Gee.ArrayList<Job>? poll_stale_merge_requests (uint project_id, Soup.Session? default_soup_session = null, string db_dir = Config.SHARED_STATE_DIR, GLib.DateTime? default_date = null) {
+        protected Gee.ArrayList<Job>? poll_stale_merge_requests (uint project_id, Soup.Session? default_soup_session = null, GLib.DateTime? default_date = null) {
             string json_reply;
             var parser = new Json.Parser ();
             var query_url = "%s/api/v4/projects/%u/merge_requests?state=opened&updated_before=%s".printf (this.gitlab_instance_url, project_id, default_date.to_string () ?? new GLib.DateTime.now ().add_days (-14).to_string ());
@@ -41,6 +42,38 @@ namespace AlpineQaBot {
                 }
             } catch (GLib.Error e) {
                 warning ("Failed to iterate over stale MRs due to error %s", e.message);
+            }
+
+            return res;
+        }
+
+        protected Gee.ArrayList<Job>? poll_active_merge_requests (uint project_id, Soup.Session? default_soup_session = null, GLib.DateTime? default_date = null) {
+            string json_reply;
+            var parser = new Json.Parser ();
+            var query_url = "%s/api/v4/projects/%u/merge_requests?state=opened&labels=status:mr-stale&updated_after=%s".printf (this.gitlab_instance_url, project_id, default_date.to_string () ?? new GLib.DateTime.now ().add_days (-14).to_string ());
+            var request_sender = new RequestSender (query_url, "GET", null, null, default_soup_session);
+
+            request_sender.send (out json_reply);
+
+            if (json_reply == null) {
+                warning ("Didn't get reply from Gitlab for polling...");
+                return null;
+            }
+
+            try {
+                parser.load_from_data (json_reply);
+            } catch (GLib.Error e) {
+                warning ("Failed to parse response containing all open MRs due to error %s", e.message);
+                return null;
+            }
+
+            Gee.ArrayList<Job> res = new Gee.ArrayList<Job>();
+            try {
+                foreach (var merge_request in parser.get_root ().get_array ().get_elements ()) {
+                    res.add ((Job) new ActiveMergeRequestJob.from_json (Json.to_string (merge_request, false), gitlab_instance_url, api_auth_token));
+                }
+            } catch (GLib.Error e) {
+                warning ("Failed to iterate over active MRs due to error %s", e.message);
             }
 
             return res;

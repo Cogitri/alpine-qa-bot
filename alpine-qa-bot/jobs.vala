@@ -423,7 +423,6 @@ namespace AlpineQaBot {
             var project = Project (root_object.get_int_member ("target_project_id"), null);
             base (project, gitlab_instance_url, api_authentication_token);
             this.merge_request = MergeRequest.from_json_object (root_object);
-            this.last_update = new GLib.DateTime.from_iso8601 (root_object.get_string_member ("updated_at"), null);
         }
 
         public override bool process (Soup.Session? default_soup_session = null) {
@@ -449,9 +448,38 @@ namespace AlpineQaBot {
             return true;
         }
 
-        public GLib.DateTime last_update { get; private set; }
         public MergeRequest merge_request { get; private set; }
         private const string STALE_MERGE_REQUEST_MESSAGE = "Beep Boop, I'm a bot. I've detected that this merge request hasn't been updated in the last two weeks. It will be closed if no further activity occurs. Thank you for your contributions.";
     }
 
+    class ActiveMergeRequestJob : Job {
+        public ActiveMergeRequestJob (Project project, string gitlab_instance_url, string api_auth_token) {
+            base (project, gitlab_instance_url, api_auth_token);
+        }
+
+        public ActiveMergeRequestJob.from_json (string json, string gitlab_instance_url, string api_authentication_token) throws GLib.Error {
+            var root_object = Json.from_string (json).get_object ();
+
+            var project = Project (root_object.get_int_member ("target_project_id"), null);
+            base (project, gitlab_instance_url, api_authentication_token);
+            this.merge_request = MergeRequest.from_json_object (root_object);
+        }
+
+        public override bool process (Soup.Session? default_soup_session = null) {
+            debug ("Querying Gitlab to remove status:mr-stale lable");
+
+            var mr_query_url = "%s/api/v4/projects/%lld/merge_requests/%lld".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
+
+            var request_sender = new RequestSender (mr_query_url, "PUT", this.api_authentication_token, "{\"remove_labels\": [\"status:mr-stale\"]}".data, default_soup_session);
+
+            if (!request_sender.send (null)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        public MergeRequest merge_request { get; private set; }
+        private const string STALE_MERGE_REQUEST_MESSAGE = "Beep Boop, I'm a bot. I've detected that this merge request hasn't been updated in the last two weeks. It will be closed if no further activity occurs. Thank you for your contributions.";
+    }
 }

@@ -5,23 +5,31 @@ namespace AlpineQaBot {
             this.gitlab_instance_url = gitlab_instance_url;
         }
 
-        public Gee.ArrayList<Job> poll (uint project_id, Soup.Session? default_soup_session = null, string db_dir = Config.SHARED_STATE_DIR) throws DatabaseError {
+        public async Gee.ArrayList<Job> poll (uint project_id, Soup.Session? default_soup_session = null, string db_dir = Config.SHARED_STATE_DIR, GLib.DateTime? default_date = null) throws DatabaseError {
             Gee.ArrayList<Job> res = new Gee.ArrayList<Job>();
 
-            res.add_all (this.poll_active_merge_requests (project_id, default_soup_session) ?? new Gee.ArrayList<Job>());
-            res.add_all (this.poll_stale_merge_requests (project_id, default_soup_session) ?? new Gee.ArrayList<Job>());
-            res.add_all (this.poll_failed_merge_requests (project_id, default_soup_session, db_dir) ?? new Gee.ArrayList<Job>());
+            var ret = yield this.poll_active_merge_requests(project_id, default_soup_session, default_date);
+
+            res.add_all (ret ?? new Gee.ArrayList<Job>());
+
+            ret = yield this.poll_stale_merge_requests(project_id, default_soup_session, default_date);
+
+            res.add_all (ret ?? new Gee.ArrayList<Job>());
+
+            ret = yield this.poll_failed_merge_requests(project_id, default_soup_session, db_dir);
+
+            res.add_all (ret ?? new Gee.ArrayList<Job>());
 
             return res;
         }
 
-        protected Gee.ArrayList<Job>? poll_stale_merge_requests (uint project_id, Soup.Session? default_soup_session = null, GLib.DateTime? default_date = null) {
+        protected async Gee.ArrayList<Job>? poll_stale_merge_requests (uint project_id, Soup.Session? default_soup_session = null, GLib.DateTime? default_date = null) {
             string json_reply;
             var parser = new Json.Parser ();
             var query_url = "%s/api/v4/projects/%u/merge_requests?state=opened&updated_before=%s".printf (this.gitlab_instance_url, project_id, default_date.to_string () ?? new GLib.DateTime.now ().add_days (-14).to_string ());
             var request_sender = new RequestSender (query_url, "GET", null, null, default_soup_session);
 
-            request_sender.send (out json_reply);
+            yield request_sender.send(out json_reply);
 
             if (json_reply == null) {
                 warning ("Didn't get reply from Gitlab for polling...");
@@ -47,13 +55,13 @@ namespace AlpineQaBot {
             return res;
         }
 
-        protected Gee.ArrayList<Job>? poll_active_merge_requests (uint project_id, Soup.Session? default_soup_session = null, GLib.DateTime? default_date = null) {
+        protected async Gee.ArrayList<Job>? poll_active_merge_requests (uint project_id, Soup.Session? default_soup_session = null, GLib.DateTime? default_date = null) {
             string json_reply;
             var parser = new Json.Parser ();
             var query_url = "%s/api/v4/projects/%u/merge_requests?state=opened&labels=status:mr-stale&updated_after=%s".printf (this.gitlab_instance_url, project_id, default_date.to_string () ?? new GLib.DateTime.now ().add_days (-14).to_string ());
             var request_sender = new RequestSender (query_url, "GET", null, null, default_soup_session);
 
-            request_sender.send (out json_reply);
+            yield request_sender.send(out json_reply);
 
             if (json_reply == null) {
                 warning ("Didn't get reply from Gitlab for polling...");
@@ -80,7 +88,7 @@ namespace AlpineQaBot {
             return res;
         }
 
-        protected Gee.ArrayList<Job>? poll_failed_merge_requests (uint project_id, Soup.Session? default_soup_session = null, string db_dir = Config.SHARED_STATE_DIR) throws DatabaseError {
+        protected async Gee.ArrayList<Job>? poll_failed_merge_requests (uint project_id, Soup.Session? default_soup_session = null, string db_dir = Config.SHARED_STATE_DIR) throws DatabaseError {
             GLib.List<weak Json.Node? > merge_requests;
             string json_reply;
             var database = new SqliteDatabase ();
@@ -88,7 +96,7 @@ namespace AlpineQaBot {
             var query_url = "%s/api/v4/projects/%u/merge_requests?state=opened&view=simple".printf (this.gitlab_instance_url, project_id);
             var request_sender = new RequestSender (query_url, "GET", null, null, default_soup_session);
 
-            request_sender.send (out json_reply);
+            yield request_sender.send(out json_reply);
 
             if (json_reply == null) {
                 warning ("Didn't get reply from Gitlab for polling...");
@@ -115,7 +123,8 @@ namespace AlpineQaBot {
                     PipelineJob pipeline_job;
                     MergeRequestInfo? merge_request_info;
 
-                    merge_request_sender.send (out merge_request_json_reply);
+                    yield merge_request_sender.send(out merge_request_json_reply);
+
                     pipeline_job = new PipelineJob.from_json (merge_request_json_reply, this.gitlab_instance_url, this.api_auth_token);
                     merge_request_info = database.get_merge_request_info (merge_request_id);
                     if (merge_request_info == null || merge_request_info.pipeline_status != pipeline_job.status) {

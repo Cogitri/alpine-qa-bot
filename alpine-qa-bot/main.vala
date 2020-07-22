@@ -43,7 +43,7 @@ public int main (string[] args) {
         if (job is AlpineQaBot.JobShutdown) {
             loop.quit ();
         }
-        job.process ();
+        job.process.begin ();
     });
     loop.run ();
     return 0;

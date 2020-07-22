@@ -92,18 +92,16 @@ void test_server_merge_request_job_process () {
     req_soup_session.queue_message (soup_message, (session, msg) => {
         assert ((string) msg.response_body.data == "{'message': 'OK'}");
         assert (msg.status_code == 200);
-        ev.job_received (new AlpineQaBot.JobShutdown ());
     });
 
     ev.job_received.connect ((job) => {
-        if (job is AlpineQaBot.JobShutdown) {
-            loop.quit ();
-        }
         var mr_job = job as AlpineQaBot.MergeRequestJob;
         if (mr_job != null) {
             mr_job.suggestion_file_path = Test.build_filename (Test.FileType.DIST, "../data/suggestions.json");
         }
-        job.process (TestLib.get_test_soup_session (mock_server));
+        job.process.begin (TestLib.get_test_soup_session (mock_server), () => {
+            loop.quit ();
+        });
     });
 
     loop.run ();
@@ -151,10 +149,11 @@ void test_server_merge_request_job_invalid () {
     });
 
     ev.job_received.connect ((job) => {
-        if (job is AlpineQaBot.JobShutdown) {
-            loop.quit ();
-        }
-        job.process (TestLib.get_test_soup_session (mock_server));
+        job.process.begin (TestLib.get_test_soup_session (mock_server), () => {
+            if (job is AlpineQaBot.JobShutdown) {
+                loop.quit ();
+            }
+        });
     });
 
     Test.expect_message (null, GLib.LogLevelFlags.LEVEL_WARNING, "*Failed to add new job due to error*");
@@ -205,10 +204,11 @@ void test_server_job_unknown () {
     });
 
     ev.job_received.connect ((job) => {
-        if (job is AlpineQaBot.JobShutdown) {
-            loop.quit ();
-        }
-        job.process (TestLib.get_test_soup_session (mock_server));
+        job.process.begin (TestLib.get_test_soup_session (mock_server), () => {
+            if (job is AlpineQaBot.JobShutdown) {
+                loop.quit ();
+            }
+        });
     });
 
     Test.expect_message (null, GLib.LogLevelFlags.LEVEL_WARNING, "*Received unknown event Unknown*");

@@ -65,7 +65,12 @@ void test_merge_request_process () {
 
     Test.expect_message (null, GLib.LogLevelFlags.LEVEL_WARNING, "*Failed to get a suggestion for an alternative commit message due to error Failed to open file*");
 
-    merge_request_job.process (soup_session);
+    merge_request_job.process.begin (soup_session);
+
+    var main_context = GLib.MainContext.default ();
+    while (main_context.pending ()) {
+        main_context.iteration (false);
+    }
 
     Test.assert_expected_messages ();
 

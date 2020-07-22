@@ -23,15 +23,17 @@ namespace AlpineQaBot {
 
                 GLib.Timeout.add_seconds (300, () => {
                     foreach (var id in poller_project_ids) {
-                        Gee.ArrayList<Job> jobs = null;
-                        try {
-                            jobs = this.poller.poll (id, null);
-                        } catch (DatabaseError e) {
-                            warning ("Failed to poll for changes due to error %s", e.message);
-                        }
-                        foreach (var job in jobs) {
-                            this.job_received (job);
-                        }
+                        this.poller.poll.begin (id, null, Config.SHARED_STATE_DIR, null, (_, res) => {
+                            Gee.ArrayList<Job> jobs = null;
+                            try {
+                                jobs = this.poller.poll.end (res);
+                            } catch (DatabaseError e) {
+                                warning ("Failed to poll for changes due to error %s", e.message);
+                            }
+                            foreach (var job in jobs) {
+                                this.job_received (job);
+                            }
+                        });
                     }
 
                     return GLib.Source.CONTINUE;

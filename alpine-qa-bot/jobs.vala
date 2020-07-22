@@ -218,17 +218,36 @@ namespace AlpineQaBot {
             }
         }
 
-        public bool send (out string reply) {
-            this.soup_session.send_message (this.soup_message);
+        public async bool send (out string reply) {
+            SourceFunc callback = send.callback;
+            InputStream? input_stream = null;
+
+            this.soup_session.send_async.begin (this.soup_message, null, (_, res) => {
+                try {
+                    input_stream = this.soup_session.send_async.end (res);
+                } catch (GLib.Error e) {
+                    warning ("Failed to send request to Gitlab due to error %s", e.message);
+                }
+                Idle.add ((owned) callback);
+            });
+
+            yield;
+
+            try {
+                var data_stream = new DataInputStream (input_stream);
+                reply = yield data_stream.read_line_async();
+
+            } catch (GLib.Error e) {
+                warning ("Failed to read reply of Gitlab due to error %s", e.message);
+                reply = null;
+            }
 
             // https://docs.gitlab.com/ee/api/#status-codes
             if (!(this.soup_message.status_code == 200 || this.soup_message.status_code == 201 || this.soup_message.status_code == 204)) {
-                warning ("Got HTTP status code %u back from gitlab. Response: %s", this.soup_message.status_code, (string) this.soup_message.response_body.data);
+                warning ("Got HTTP status code %u back from gitlab. Response: %s", this.soup_message.status_code, reply);
                 reply = null;
                 return false;
             }
-
-            reply = (string) this.soup_message.response_body.data;
 
             return true;
         }
@@ -250,7 +269,7 @@ namespace AlpineQaBot {
             this.api_authentication_token = api_authentication_token;
         }
 
-        public abstract bool process(Soup.Session? default_soup_session = null);
+        public async abstract bool process(Soup.Session? default_soup_session = null);
 
         public string? api_authentication_token { get; private set; }
         public string? gitlab_instance_url { get; private set; }
@@ -262,7 +281,7 @@ namespace AlpineQaBot {
             base (null, null, null);
         }
 
-        public override bool process (Soup.Session? default_soup_session = null) {
+        public async override bool process (Soup.Session? default_soup_session = null) {
             return true;
         }
 
@@ -312,7 +331,7 @@ namespace AlpineQaBot {
             }
         }
 
-        public override bool process (Soup.Session? default_soup_session = null) {
+        public override async bool process (Soup.Session? default_soup_session = null) {
             if ((this.status == PipelineStatus.Failed || this.status == PipelineStatus.Success)) {
                 debug ("Querying Gitlab to add/remove status:mr-build-broken label to successfull/failing MR");
 
@@ -327,7 +346,7 @@ namespace AlpineQaBot {
 
                 var request_sender = new RequestSender (query_url, "PUT", this.api_authentication_token, message.data, default_soup_session);
 
-                if (!request_sender.send (null)) {
+                if (!yield request_sender.send (null)) {
                     return false;
                 }
             }
@@ -353,7 +372,7 @@ namespace AlpineQaBot {
             this.merge_request = MergeRequest.from_json_object ((!)root_object.get_object_member ("object_attributes"));
         }
 
-        public override bool process (Soup.Session? default_soup_session = null) {
+        public async override bool process (Soup.Session? default_soup_session = null) {
             string? commit_message_suggestion = null;
             try {
                 commit_message_suggestion = this.get_commit_message_suggestion ();
@@ -366,7 +385,7 @@ namespace AlpineQaBot {
 
                 var query_url = "%s/api/v4/projects/%lld/merge_requests/%lld/notes".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
                 var request_sender = new RequestSender (query_url, "POST", this.api_authentication_token, "{\"body\": \"%s\"}".printf (COMMIT_SUGGESTION_TEMPLATE).printf (commit_message_suggestion).data, default_soup_session);
-                if (!request_sender.send (null)) {
+                if (!yield request_sender.send (null)) {
                     return false;
                 }
             }
@@ -378,7 +397,7 @@ namespace AlpineQaBot {
                 // FIXME: Gitlab API doesn't know allow_collaboration is a valid parameter and wants us to specify at least one valid param,
                 // so we just specify an empty add_labels here.
                 var request_sender = new RequestSender (query_url, "PUT", this.api_authentication_token, "{\"add_labels\": null,\"allow_collaboration\": true}".data, default_soup_session);
-                if (!request_sender.send (null)) {
+                if (!yield request_sender.send (null)) {
                     return false;
                 }
             }
@@ -421,22 +440,22 @@ namespace AlpineQaBot {
             this.merge_request = MergeRequest.from_json_object (root_object);
         }
 
-        public override bool process (Soup.Session? default_soup_session = null) {
+        public async override bool process (Soup.Session? default_soup_session = null) {
             var mr_query_url = "%s/api/v4/projects/%lld/merge_requests/%lld".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
             if (this.merge_request.labels.contains ("status:mr-stale")) {
                 var close_request_sender = new RequestSender (mr_query_url, "PUT", this.api_authentication_token, "{\"state_event\": \"close\"}".data, default_soup_session);
-                if (!close_request_sender.send (null)) {
+                if (!yield close_request_sender.send (null)) {
                     return false;
                 }
                 return true;
             } else {
                 var note_add_request_sender = new RequestSender (mr_query_url + "/notes", "POST", this.api_authentication_token, @"{\"body\": \"$STALE_MERGE_REQUEST_MESSAGE\"}".data, default_soup_session);
-                if (!note_add_request_sender.send (null)) {
+                if (!yield note_add_request_sender.send (null)) {
                     return false;
                 }
                 var label_add_request_sender = new RequestSender (mr_query_url, "PUT", this.api_authentication_token, "{\"add_labels\": [\"status:mr-stale\"]}".data, default_soup_session);
 
-                if (!label_add_request_sender.send (null)) {
+                if (!yield label_add_request_sender.send (null)) {
                     return false;
                 }
             }
@@ -461,14 +480,14 @@ namespace AlpineQaBot {
             this.merge_request = MergeRequest.from_json_object (root_object);
         }
 
-        public override bool process (Soup.Session? default_soup_session = null) {
+        public async override bool process (Soup.Session? default_soup_session = null) {
             debug ("Querying Gitlab to remove status:mr-stale lable");
 
             var mr_query_url = "%s/api/v4/projects/%lld/merge_requests/%lld".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
 
             var request_sender = new RequestSender (mr_query_url, "PUT", this.api_authentication_token, "{\"remove_labels\": [\"status:mr-stale\"]}".data, default_soup_session);
 
-            if (!request_sender.send (null)) {
+            if (!yield request_sender.send (null)) {
                 return false;
             }
 

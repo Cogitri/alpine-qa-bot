@@ -68,8 +68,9 @@ namespace AlpineQaBot {
             }
 
             Gee.ArrayList<Job> res = new Gee.ArrayList<Job>();
+            var merge_requests = parser.get_root ().get_array ().get_elements ();
             try {
-                foreach (var merge_request in parser.get_root ().get_array ().get_elements ()) {
+                foreach (var merge_request in merge_requests) {
                     res.add ((Job) new ActiveMergeRequestJob.from_json (Json.to_string (merge_request, false), gitlab_instance_url, api_auth_token));
                 }
             } catch (GLib.Error e) {

@@ -274,9 +274,7 @@ namespace AlpineQaBot {
         }
 
         public PipelineJob.from_json (string json, string gitlab_instance_url, string api_authentication_token) throws GLib.Error {
-            var parser = new Json.Parser ();
-            parser.load_from_data (json);
-            var root_object = parser.get_root ().get_object ();
+            var root_object = Json.from_string (json).get_object ();
 
             var project = Project (root_object.get_int_member ("target_project_id"), null);
             base (project, gitlab_instance_url, api_authentication_token);
@@ -349,9 +347,7 @@ namespace AlpineQaBot {
         }
 
         public MergeRequestJob.from_json (string json, string gitlab_instance_url, string api_authentication_token) throws GLib.Error {
-            var parser = new Json.Parser ();
-            parser.load_from_data (json);
-            var root_object = parser.get_root ().get_object ();
+            var root_object = Json.from_string (json).get_object ();
 
             base.from_json_object ((!)root_object.get_object_member ("project"), gitlab_instance_url, api_authentication_token);
             this.merge_request = MergeRequest.from_json_object ((!)root_object.get_object_member ("object_attributes"));

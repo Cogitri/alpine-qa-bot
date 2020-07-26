@@ -10,11 +10,11 @@ namespace AlpineQaBot {
 
             Gee.ArrayList<Job> res = new Gee.ArrayList<Job>();
 
-            var ret = yield this.poll_active_merge_requests(project_id, default_soup_session, default_date);
+            var ret = yield this.poll_active_merge_requests(project_id, default_soup_session, db_dir, default_date);
 
             res.add_all (ret ?? new Gee.ArrayList<Job>());
 
-            ret = yield this.poll_stale_merge_requests(project_id, default_soup_session, default_date);
+            ret = yield this.poll_stale_merge_requests(project_id, default_soup_session, db_dir, default_date);
 
             res.add_all (ret ?? new Gee.ArrayList<Job>());
 
@@ -25,11 +25,14 @@ namespace AlpineQaBot {
             return res;
         }
 
-        protected async Gee.ArrayList<Job>? poll_stale_merge_requests (uint project_id, Soup.Session? default_soup_session = null, GLib.DateTime? default_date = null) {
+        protected async Gee.ArrayList<Job>? poll_stale_merge_requests (uint project_id, Soup.Session? default_soup_session = null, string db_dir = Config.SHARED_STATE_DIR, GLib.DateTime? default_date = null) throws DatabaseError {
             string json_reply;
+            var db = new SqliteDatabase ();
             var parser = new Json.Parser ();
             var query_url = "%s/api/v4/projects/%u/merge_requests?state=opened&updated_before=%s".printf (this.gitlab_instance_url, project_id, default_date != null ? default_date.to_string () : new GLib.DateTime.now ().add_days (-14).to_string ());
             var request_sender = new RequestSender (query_url, "GET", null, null, default_soup_session);
+
+            db.open ("%s/poller.db".printf (db_dir));
 
             yield request_sender.send(out json_reply);
 
@@ -46,8 +49,11 @@ namespace AlpineQaBot {
             }
 
             Gee.ArrayList<Job> res = new Gee.ArrayList<Job>();
+            var now_time = new GLib.DateTime.now ();
             try {
                 foreach (var merge_request in parser.get_root ().get_array ().get_elements ()) {
+                    var id = merge_request.get_object ().get_int_member ("id");
+                    db.save_stale_mark_time (id, now_time);
                     res.add ((Job) new StaleMergeRequestJob.from_json (Json.to_string (merge_request, false), gitlab_instance_url, api_auth_token));
                 }
             } catch (GLib.Error e) {
@@ -57,11 +63,14 @@ namespace AlpineQaBot {
             return res;
         }
 
-        protected async Gee.ArrayList<Job>? poll_active_merge_requests (uint project_id, Soup.Session? default_soup_session = null, GLib.DateTime? default_date = null) {
+        protected async Gee.ArrayList<Job>? poll_active_merge_requests (uint project_id, Soup.Session? default_soup_session = null, string db_dir = Config.SHARED_STATE_DIR, GLib.DateTime? default_date = null) throws DatabaseError {
             string json_reply;
+            var db = new SqliteDatabase ();
             var parser = new Json.Parser ();
             var query_url = "%s/api/v4/projects/%u/merge_requests?state=opened&labels=status:mr-stale&updated_after=%s".printf (this.gitlab_instance_url, project_id, default_date != null ? default_date.to_string () : new GLib.DateTime.now ().add_days (-14).to_string ());
             var request_sender = new RequestSender (query_url, "GET", null, null, default_soup_session);
+
+            db.open ("%s/poller.db".printf (db_dir));
 
             yield request_sender.send(out json_reply);
 
@@ -81,7 +90,14 @@ namespace AlpineQaBot {
             var merge_requests = parser.get_root ().get_array ().get_elements ();
             try {
                 foreach (var merge_request in merge_requests) {
-                    res.add ((Job) new ActiveMergeRequestJob.from_json (Json.to_string (merge_request, false), gitlab_instance_url, api_auth_token));
+                    var id = merge_request.get_object ().get_int_member ("id");
+                    var stale_mark_time = db.get_stale_mark_time (id);
+                    if (stale_mark_time != null) {
+                        var last_update = new GLib.DateTime.from_iso8601 (merge_request.get_object ().get_string_member ("updated_at"), null);
+                        if (stale_mark_time.difference (last_update) >= GLib.TimeSpan.SECOND) {
+                            res.add ((Job) new ActiveMergeRequestJob.from_json (Json.to_string (merge_request, false), gitlab_instance_url, api_auth_token));
+                        }
+                    }
                 }
             } catch (GLib.Error e) {
                 warning ("Failed to iterate over active MRs due to error %s", e.message);

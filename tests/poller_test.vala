@@ -29,6 +29,13 @@ void test_poller_poll () {
     var poller = new AlpineQaBot.Poller (api_token, instance_url);
     var test_soup_session = TestLib.get_test_soup_session (mock_server);
     var loop = new MainLoop ();
+    var db = new AlpineQaBot.SqliteDatabase ();
+    try {
+        db.open ("%s/poller.db".printf (tmp_dir.file_path));
+        db.save_stale_mark_time (63528046, new GLib.DateTime.now ());
+    } catch (GLib.Error e) {
+        error (e.message);
+    }
 
     poller.poll.begin (19765543, test_soup_session, tmp_dir.file_path, new GLib.DateTime.from_iso8601 ("2020-07-20T19:57:00Z", null), (obj, res) => {
         Gee.ArrayList<AlpineQaBot.Job> jobs;
@@ -75,6 +82,13 @@ void test_poller_poll_unmark_failed_ci () {
     var poller = new AlpineQaBot.Poller (api_token, instance_url);
     var test_soup_session = TestLib.get_test_soup_session (mock_server);
     var loop = new MainLoop ();
+    var db = new AlpineQaBot.SqliteDatabase ();
+    try {
+        db.open ("%s/poller.db".printf (tmp_dir.file_path));
+        db.save_stale_mark_time (63768870, new GLib.DateTime.now ());
+    } catch (GLib.Error e) {
+        error (e.message);
+    }
 
     poller.poll.begin (19765543, test_soup_session, tmp_dir.file_path, new GLib.DateTime.from_iso8601 ("2020-07-20T11:33:20+0200", null), (obj, res) => {
         Gee.ArrayList<AlpineQaBot.Job> jobs;
@@ -119,6 +133,16 @@ void test_poller_poll_unmark_stale () {
     var poller = new AlpineQaBot.Poller (api_token, instance_url);
     var test_soup_session = TestLib.get_test_soup_session (mock_server);
     var loop = new MainLoop ();
+    var db = new AlpineQaBot.SqliteDatabase ();
+    try {
+        db.open ("%s/poller.db".printf (tmp_dir.file_path));
+        // Shouldn't be unmarked - last activity after marking stale
+        db.save_stale_mark_time (63768870, new GLib.DateTime.now ().add_days (-1));
+        // Should be unmarked - last activity now, after marking stale
+        db.save_stale_mark_time (63528046, new GLib.DateTime.now ());
+    } catch (GLib.Error e) {
+        error (e.message);
+    }
 
     poller.poll.begin (19765543, test_soup_session, tmp_dir.file_path, new GLib.DateTime.from_iso8601 ("2020-07-20T11:33:20+0200", null), (obj, res) => {
         Gee.ArrayList<AlpineQaBot.Job> jobs;

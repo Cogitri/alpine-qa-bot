@@ -15,13 +15,18 @@ namespace AlpineQaBot {
     public interface Database {
         public abstract void open(string filename) throws DatabaseError;
 
-        public abstract void save_pipeline_status(int64 id, PipelineStatus status) throws DatabaseError;
+        public abstract void delete_pipeline_status(int64 id) throws DatabaseError;
 
         public abstract PipelineStatus? get_pipeline_status (int64 id) throws DatabaseError;
 
-        public abstract void save_stale_mark_time(int64 id, GLib.DateTime stale_mark_time) throws DatabaseError;
+        public abstract void save_pipeline_status(int64 id, PipelineStatus status) throws DatabaseError;
+
+        public abstract void delete_stale_mark_time(int64 id) throws DatabaseError;
 
         public abstract GLib.DateTime? get_stale_mark_time (int64 id) throws DatabaseError;
+
+        public abstract void save_stale_mark_time(int64 id, GLib.DateTime stale_mark_time) throws DatabaseError;
+
     }
 
     public class SqliteDatabase : GLib.Object, Database {
@@ -55,7 +60,7 @@ namespace AlpineQaBot {
             string errmsg;
 
             if ((rc = db.exec (query, null, out errmsg)) != Sqlite.OK) {
-                throw new DatabaseError.SAVE_FAILED ("Failed to save MR Info to SQLite database due to error %s", errmsg);
+                throw new DatabaseError.SAVE_FAILED ("Failed to save pipeline_status to SQLite database due to error %s", errmsg);
             }
         }
 
@@ -65,7 +70,7 @@ namespace AlpineQaBot {
             string query = "SELECT * FROM MR_Info WHERE id = %lld AND pipeline_status IS NOT NULL;".printf (id);
 
             if ((rc = this.db.prepare_v2 (query, -1, out stmt, null)) == 1) {
-                throw new DatabaseError.GET_FAILED ("Failed to get MR Info from SQLite database due to error %s", db.errmsg ());
+                throw new DatabaseError.GET_FAILED ("Failed to get pipeline_status from SQLite database due to error %s", db.errmsg ());
             }
 
             if (stmt.step () == Sqlite.ROW) {
@@ -75,6 +80,16 @@ namespace AlpineQaBot {
             return null;
         }
 
+        public void delete_pipeline_status (int64 id) throws DatabaseError {
+            int rc;
+            string query = "UPDATE MR_Info SET pipeline_status = NULL WHERE id = %lld".printf (id);
+            string errmsg;
+
+            if ((rc = db.exec (query, null, out errmsg)) != Sqlite.OK) {
+                throw new DatabaseError.SAVE_FAILED ("Failed to set pipeline_status to NULL in SQLite database due to error %s", errmsg);
+            }
+            this.delete_null_entries ();
+        }
 
         public void save_stale_mark_time (int64 id, GLib.DateTime stale_mark_time) throws DatabaseError {
             string query = "INSERT INTO MR_Info (id, stale_mark_time) VALUES (%lld, '%s');".printf (id, stale_mark_time.to_string ());
@@ -82,7 +97,7 @@ namespace AlpineQaBot {
             string errmsg;
 
             if ((rc = db.exec (query, null, out errmsg)) != Sqlite.OK) {
-                throw new DatabaseError.SAVE_FAILED ("Failed to save MR Info to SQLite database due to error %s", errmsg);
+                throw new DatabaseError.SAVE_FAILED ("Failed to save stale mark time to SQLite database due to error %s", errmsg);
             }
         }
 
@@ -92,7 +107,7 @@ namespace AlpineQaBot {
             string query = "SELECT * FROM MR_Info WHERE id = %lld AND stale_mark_time IS NOT NULL;".printf (id);
 
             if ((rc = this.db.prepare_v2 (query, -1, out stmt, null)) == 1) {
-                throw new DatabaseError.GET_FAILED ("Failed to get MR Info from SQLite database due to error %s", db.errmsg ());
+                throw new DatabaseError.GET_FAILED ("Failed to get stale mark time from SQLite database due to error %s", db.errmsg ());
             }
 
             if (stmt.step () == Sqlite.ROW) {
@@ -100,6 +115,27 @@ namespace AlpineQaBot {
             }
 
             return null;
+        }
+
+        public void delete_stale_mark_time (int64 id) throws DatabaseError {
+            int rc;
+            string query = "UPDATE MR_Info SET stale_mark_time = NULL WHERE id = %lld".printf (id);
+            string errmsg;
+
+            if ((rc = db.exec (query, null, out errmsg)) != Sqlite.OK) {
+                throw new DatabaseError.SAVE_FAILED ("Failed to set stale_mark_time to NULL in SQLite database due to error %s", errmsg);
+            }
+            this.delete_null_entries ();
+        }
+
+        private void delete_null_entries () throws DatabaseError {
+            int rc;
+            string query = "DELETE FROM MR_Info WHERE pipeline_status IS NULL AND stale_mark_time IS NULL";
+            string errmsg;
+
+            if ((rc = db.exec (query, null, out errmsg)) != Sqlite.OK) {
+                throw new DatabaseError.SAVE_FAILED ("Failed to delete obsolete entries from SQLite database due to error %s", errmsg);
+            }
         }
 
         Sqlite.Database db;

@@ -430,7 +430,7 @@ namespace AlpineQaBot {
 
         public async override bool process (Soup.Session? default_soup_session = null) {
             var mr_query_url = "%s/api/v4/projects/%lld/merge_requests/%lld".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
-            if (!this.merge_request.labels.contains ("status:mr-stale")) {
+            if (!this.merge_request.labels.contains ("status:mr-stale") && !this.merge_request.labels.contains ("status:mr-hold")) {
                 var msg = STALE_MERGE_REQUEST_MESSAGE_TEMPLATE.printf (this.merge_request.author != null ? " @" + this.merge_request.author.username : "", this.merge_request.assignee != null ? this.merge_request.assignee.username : "@developers");
                 var note_add_request_sender = new RequestSender (mr_query_url + "/notes", "POST", this.api_authentication_token, @"{\"body\": \"$msg\"}".data, default_soup_session);
                 if (!yield note_add_request_sender.send (null)) {

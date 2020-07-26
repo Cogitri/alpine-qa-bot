@@ -43,7 +43,12 @@ public int main (string[] args) {
         if (job is AlpineQaBot.JobShutdown) {
             loop.quit ();
         }
-        job.process.begin ();
+        job.process.begin (null, (_, res) => {
+            var successful = job.process.end (res);
+            if (!successful) {
+                warning("Failed to process job %s", job.get_type().to_string());
+            }
+        });
     });
     loop.run ();
     return 0;

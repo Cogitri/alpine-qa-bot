@@ -39,9 +39,28 @@ namespace AlpineQaBot {
         public string? name { get; private set; }
     }
 
+    public struct User {
+
+        public User (string name, string username) {
+            this.name = name;
+            this.username = username;
+        }
+
+        public User.from_json_object (Json.Object root_obj) {
+            this.name = root_obj.get_string_member ("name");
+            this.username = root_obj.get_string_member ("username");
+        }
+
+        public string name { get; private set; }
+        public string username { get; private set; }
+    }
+
+
     public struct MergeRequest {
-        public MergeRequest (MergeRequestAction action, int64 id, int64 iid, MergeRequestState state, string target_branch, int64 target_project_id) {
+        public MergeRequest (MergeRequestAction action, User assignee, User author, int64 id, int64 iid, MergeRequestState state, string target_branch, int64 target_project_id) {
             this.action = action;
+            this.assignee = assignee;
+            this.author = author;
             this.id = id;
             this.iid = iid;
             this.state = state;
@@ -101,9 +120,19 @@ namespace AlpineQaBot {
                     labels.add (label_obj.get_string ());
                 }
             }
+
+            if (root_obj.has_member ("assignee") && !root_obj.get_null_member ("assignee")) {
+                this.assignee = User.from_json_object (root_obj.get_object_member ("assignee"));
+            }
+
+            if (root_obj.has_member ("author") && !root_obj.get_null_member ("author")) {
+                this.author = User.from_json_object (root_obj.get_object_member ("author"));
+            }
         }
 
         public MergeRequestAction? action { get; private set; }
+        public User? assignee { get; private set; }
+        public User? author { get; private set; }
         public Commit? commit { get; private set; }
         public int64 id { get; private set; }
         public int64 iid { get; private set; }
@@ -402,7 +431,8 @@ namespace AlpineQaBot {
         public async override bool process (Soup.Session? default_soup_session = null) {
             var mr_query_url = "%s/api/v4/projects/%lld/merge_requests/%lld".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
             if (!this.merge_request.labels.contains ("status:mr-stale")) {
-                var note_add_request_sender = new RequestSender (mr_query_url + "/notes", "POST", this.api_authentication_token, @"{\"body\": \"$STALE_MERGE_REQUEST_MESSAGE\"}".data, default_soup_session);
+                var msg = STALE_MERGE_REQUEST_MESSAGE_TEMPLATE.printf (this.merge_request.author != null ? " @" + this.merge_request.author.username : "", this.merge_request.assignee != null ? this.merge_request.assignee.username : "@developers");
+                var note_add_request_sender = new RequestSender (mr_query_url + "/notes", "POST", this.api_authentication_token, @"{\"body\": \"$msg\"}".data, default_soup_session);
                 if (!yield note_add_request_sender.send (null)) {
                     return false;
                 }
@@ -417,15 +447,7 @@ namespace AlpineQaBot {
         }
 
         public MergeRequest merge_request { get; private set; }
-        private const string STALE_MERGE_REQUEST_MESSAGE =
-            """
-                Beep Boop, I'm a bot. I've detected that this merge request hasn't seen any recent activity.
-                As such, this MR has been marked as stale and might be closed in the future by maintainers.
-                If you need more time simply comment here (possibly pinging `@developers` if you need help)
-                and the status:mr-stale label will be removed and you can keep working on this.
-
-                Thanks for your contribution.
-            """;
+        private const string STALE_MERGE_REQUEST_MESSAGE_TEMPLATE = "Hello%s,\\n\\nI've detected that this merge request hasn't seen any recent activity. As such, this MR has been marked as stale and might be closed in the future by maintainers. If you need more time simply comment here (possibly pinging `%s` if you need help) and the status:mr-stale label will be removed and you can keep working on this.\\n\\nThanks for your contribution.";
     }
 
     class ActiveMergeRequestJob : Job {

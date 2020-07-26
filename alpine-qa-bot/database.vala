@@ -29,12 +29,7 @@ namespace AlpineQaBot {
 
         public abstract void save_merge_request_info(int64 id, MergeRequestInfo merge_request_info) throws DatabaseError;
 
-        public abstract void save_all_merge_request_info(Gee.HashMap<int64? , MergeRequestInfo> merge_request_info) throws DatabaseError;
-
         public abstract MergeRequestInfo? get_merge_request_info (int64 id) throws DatabaseError;
-
-        public abstract Gee.HashMap<int64? , MergeRequestInfo> get_all_merge_request_info() throws DatabaseError;
-
     }
 
     public class SqliteDatabase : GLib.Object, Database {
@@ -71,20 +66,6 @@ namespace AlpineQaBot {
             }
         }
 
-        public void save_all_merge_request_info (Gee.HashMap<int64? , MergeRequestInfo> merge_request_info) throws DatabaseError {
-            int rc;
-            string errmsg;
-            string query = "";
-
-            foreach (var id in merge_request_info.keys) {
-                query += "INSERT INTO MR_Info (id, mr_info) VALUES (%lld, '%s')\n".printf (id, Json.gobject_to_data (merge_request_info.get (id), null));
-            }
-
-            if ((rc = this.db.exec (query, null, out errmsg)) != Sqlite.OK) {
-                throw new DatabaseError.SAVE_FAILED ("Failed to save MR Info to SQLite database due to error %s", errmsg);
-            }
-        }
-
         public MergeRequestInfo? get_merge_request_info (int64 id) throws DatabaseError {
             int rc;
             Sqlite.Statement stmt;
@@ -108,33 +89,6 @@ namespace AlpineQaBot {
 
             assert_nonnull (info);
             return info;
-        }
-
-        public Gee.HashMap<int64? , MergeRequestInfo> get_all_merge_request_info () throws DatabaseError {
-            int rc, cols;
-            Sqlite.Statement stmt;
-            const string query = "SELECT * FROM MR_Info";
-            Gee.HashMap<int64? , MergeRequestInfo> map = new Gee.HashMap<int64? , MergeRequestInfo>();
-
-            if ((rc = this.db.prepare_v2 (query, -1, out stmt, null)) == 1) {
-                throw new DatabaseError.GET_FAILED ("Failed to get MR Info from SQLite database due to error %s", db.errmsg ());
-            }
-
-
-            cols = stmt.column_count ();
-
-            while (stmt.step () == Sqlite.ROW) {
-                int64 id = stmt.column_int64 (0);
-                try {
-                    var info = Json.gobject_from_data (typeof (MergeRequestInfo), stmt.column_text (1)) as MergeRequestInfo;
-                    assert_nonnull (info);
-                    map.set (id, info);
-                } catch (GLib.Error e) {
-                    throw new DatabaseError.DATA_MALFORMED ("Failed to parse data due to error %s", e.message);
-                }
-            }
-
-            return map;
         }
 
         Sqlite.Database db;

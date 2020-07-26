@@ -401,13 +401,7 @@ namespace AlpineQaBot {
 
         public async override bool process (Soup.Session? default_soup_session = null) {
             var mr_query_url = "%s/api/v4/projects/%lld/merge_requests/%lld".printf (this.gitlab_instance_url, this.project.id, this.merge_request.iid);
-            if (this.merge_request.labels.contains ("status:mr-stale")) {
-                var close_request_sender = new RequestSender (mr_query_url, "PUT", this.api_authentication_token, "{\"state_event\": \"close\"}".data, default_soup_session);
-                if (!yield close_request_sender.send (null)) {
-                    return false;
-                }
-                return true;
-            } else {
+            if (!this.merge_request.labels.contains ("status:mr-stale")) {
                 var note_add_request_sender = new RequestSender (mr_query_url + "/notes", "POST", this.api_authentication_token, @"{\"body\": \"$STALE_MERGE_REQUEST_MESSAGE\"}".data, default_soup_session);
                 if (!yield note_add_request_sender.send (null)) {
                     return false;
@@ -423,7 +417,15 @@ namespace AlpineQaBot {
         }
 
         public MergeRequest merge_request { get; private set; }
-        private const string STALE_MERGE_REQUEST_MESSAGE = "Beep Boop, I'm a bot. I've detected that this merge request hasn't been updated in the last two weeks. It will be closed if no further activity occurs. Thank you for your contributions.";
+        private const string STALE_MERGE_REQUEST_MESSAGE =
+            """
+                Beep Boop, I'm a bot. I've detected that this merge request hasn't seen any recent activity.
+                As such, this MR has been marked as stale and might be closed in the future by maintainers.
+                If you need more time simply comment here (possibly pinging `@developers` if you need help)
+                and the status:mr-stale label will be removed and you can keep working on this.
+
+                Thanks for your contribution.
+            """;
     }
 
     class ActiveMergeRequestJob : Job {

@@ -4,18 +4,6 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 namespace AlpineQaBot {
-    public class MergeRequestInfo : GLib.Object, Json.Serializable {
-        public MergeRequestInfo (PipelineStatus pipeline_status) {
-            this.pipeline_status = pipeline_status;
-        }
-
-        public string to_string () {
-            return Json.gobject_to_data (this, null);
-        }
-
-        public PipelineStatus pipeline_status { get; set; }
-    }
-
     public errordomain DatabaseError {
         OPEN_FAILED,
         SETUP_FAILED,
@@ -27,9 +15,13 @@ namespace AlpineQaBot {
     public interface Database {
         public abstract void open(string filename) throws DatabaseError;
 
-        public abstract void save_merge_request_info(int64 id, MergeRequestInfo merge_request_info) throws DatabaseError;
+        public abstract void save_pipeline_status(int64 id, PipelineStatus status) throws DatabaseError;
 
-        public abstract MergeRequestInfo? get_merge_request_info (int64 id) throws DatabaseError;
+        public abstract PipelineStatus? get_pipeline_status (int64 id) throws DatabaseError;
+
+        public abstract void save_stale_mark_time(int64 id, GLib.DateTime stale_mark_time) throws DatabaseError;
+
+        public abstract GLib.DateTime? get_stale_mark_time (int64 id) throws DatabaseError;
     }
 
     public class SqliteDatabase : GLib.Object, Database {
@@ -37,8 +29,9 @@ namespace AlpineQaBot {
             int rc;
             const string setup_query = """
                 CREATE TABLE MR_Info (
-                    id      PRIMARY_KEY     INT     NOT NULL,
-                    mr_info                 TEXT    NOT NULL
+                    id              PRIMARY_KEY     INT     NOT NULL,
+                    pipeline_status                 INT,
+                    stale_mark_time                 CHAR(25)
                 );
             """;
             string errmsg;
@@ -56,8 +49,8 @@ namespace AlpineQaBot {
 
         }
 
-        public void save_merge_request_info (int64 id, MergeRequestInfo merge_request_info) throws DatabaseError {
-            string query = "INSERT INTO MR_Info (id, mr_info) VALUES (%lld, '%s')\n".printf (id, Json.gobject_to_data (merge_request_info, null));
+        public void save_pipeline_status (int64 id, PipelineStatus pipeline_status) throws DatabaseError {
+            string query = "INSERT INTO MR_Info (id, pipeline_status) VALUES (%lld, %d);".printf (id, pipeline_status);
             int rc;
             string errmsg;
 
@@ -66,29 +59,47 @@ namespace AlpineQaBot {
             }
         }
 
-        public MergeRequestInfo? get_merge_request_info (int64 id) throws DatabaseError {
+        public PipelineStatus? get_pipeline_status (int64 id) throws DatabaseError {
             int rc;
             Sqlite.Statement stmt;
-            string query = "SELECT * FROM MR_Info WHERE id = %lld".printf (id);
+            string query = "SELECT * FROM MR_Info WHERE id = %lld AND pipeline_status IS NOT NULL;".printf (id);
 
             if ((rc = this.db.prepare_v2 (query, -1, out stmt, null)) == 1) {
                 throw new DatabaseError.GET_FAILED ("Failed to get MR Info from SQLite database due to error %s", db.errmsg ());
             }
 
-            stmt.step ();
-            MergeRequestInfo? info;
-            var data = stmt.column_text (1);
-            if (data == null) {
-                return null;
+            if (stmt.step () == Sqlite.ROW) {
+                var data = stmt.column_int (1);
+                return (PipelineStatus) data;
             }
-            try {
-                info = Json.gobject_from_data (typeof (MergeRequestInfo), data) as MergeRequestInfo;
-            } catch (GLib.Error e) {
-                throw new DatabaseError.DATA_MALFORMED ("Failed to parse data due to error %s", e.message);
+            return null;
+        }
+
+
+        public void save_stale_mark_time (int64 id, GLib.DateTime stale_mark_time) throws DatabaseError {
+            string query = "INSERT INTO MR_Info (id, stale_mark_time) VALUES (%lld, '%s');".printf (id, stale_mark_time.to_string ());
+            int rc;
+            string errmsg;
+
+            if ((rc = db.exec (query, null, out errmsg)) != Sqlite.OK) {
+                throw new DatabaseError.SAVE_FAILED ("Failed to save MR Info to SQLite database due to error %s", errmsg);
+            }
+        }
+
+        public GLib.DateTime? get_stale_mark_time (int64 id) throws DatabaseError {
+            int rc;
+            Sqlite.Statement stmt;
+            string query = "SELECT * FROM MR_Info WHERE id = %lld AND stale_mark_time IS NOT NULL;".printf (id);
+
+            if ((rc = this.db.prepare_v2 (query, -1, out stmt, null)) == 1) {
+                throw new DatabaseError.GET_FAILED ("Failed to get MR Info from SQLite database due to error %s", db.errmsg ());
             }
 
-            assert_nonnull (info);
-            return info;
+            if (stmt.step () == Sqlite.ROW) {
+                return new GLib.DateTime.from_iso8601 (stmt.column_text (2), null);
+            }
+
+            return null;
         }
 
         Sqlite.Database db;

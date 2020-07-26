@@ -123,17 +123,17 @@ namespace AlpineQaBot {
                     var merge_request_sender = new RequestSender (merge_request_query_url, "GET", null, null, default_soup_session);
                     string merge_request_json_reply;
                     PipelineJob pipeline_job;
-                    MergeRequestInfo? merge_request_info;
+                    PipelineStatus? pipeline_status;
 
                     yield merge_request_sender.send(out merge_request_json_reply);
 
                     pipeline_job = new PipelineJob.from_json (merge_request_json_reply, this.gitlab_instance_url, this.api_auth_token);
-                    merge_request_info = database.get_merge_request_info (merge_request_id);
-                    if (merge_request_info == null || merge_request_info.pipeline_status != pipeline_job.status) {
+                    pipeline_status = database.get_pipeline_status (merge_request_id);
+                    if (pipeline_status == null || pipeline_status != pipeline_job.status) {
                         res.add ((Job) pipeline_job);
-                        merge_request_info = new MergeRequestInfo (pipeline_job.status);
+                        pipeline_status = pipeline_job.status;
                     }
-                    database.save_merge_request_info (merge_request_id, merge_request_info);
+                    database.save_pipeline_status (merge_request_id, pipeline_status);
                 }
             } catch (GLib.Error e) {
                 warning ("Failed to iterate over merge requests due to error %s", e.message);

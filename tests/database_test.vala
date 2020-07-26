@@ -15,43 +15,44 @@ void test_database_init () {
     }
 }
 
-void test_database_get_set_merge_request_info () {
+void test_database_get_set_pipeline_status () {
+    const AlpineQaBot.PipelineStatus PIPELINE_STATUS = AlpineQaBot.PipelineStatus.Success;
     var db = new AlpineQaBot.SqliteDatabase ();
     var tmp_dir = new TestLib.TestTempFile ();
 
     try {
-        db.open ("%s/test_get_set_merge_request_info.db".printf (tmp_dir.file_path));
-    } catch (AlpineQaBot.DatabaseError e) {
-        error (e.message);
-    }
-    var merge_request_info = new AlpineQaBot.MergeRequestInfo (AlpineQaBot.PipelineStatus.Success);
-    try {
-        db.save_merge_request_info (0, merge_request_info);
+        db.open ("%s/test_get_set_pipeline_status.db".printf (tmp_dir.file_path));
     } catch (AlpineQaBot.DatabaseError e) {
         error (e.message);
     }
 
     try {
-        var new_info = db.get_merge_request_info (0);
-        assert (new_info.pipeline_status == merge_request_info.pipeline_status);
+        db.save_pipeline_status (0, PIPELINE_STATUS);
+    } catch (AlpineQaBot.DatabaseError e) {
+        error (e.message);
+    }
+
+    try {
+        var new_status = db.get_pipeline_status (0);
+        assert (new_status == PIPELINE_STATUS);
     } catch (AlpineQaBot.DatabaseError e) {
         error (e.message);
     }
 }
 
-void test_database_get_set_merge_request_info_existing_db () {
+void test_database_get_set_pipeline_status_existing_db () {
+    const AlpineQaBot.PipelineStatus PIPELINE_STATUS = AlpineQaBot.PipelineStatus.Success;
     var tmp_dir = new TestLib.TestTempFile ();
-    var merge_request_info = new AlpineQaBot.MergeRequestInfo (AlpineQaBot.PipelineStatus.Success);
 
     {
         var db = new AlpineQaBot.SqliteDatabase ();
         try {
-            db.open ("%s/test_get_set_merge_request_info.db".printf (tmp_dir.file_path));
+            db.open ("%s/test_get_set_pipeline_status.db".printf (tmp_dir.file_path));
         } catch (AlpineQaBot.DatabaseError e) {
             error (e.message);
         }
         try {
-            db.save_merge_request_info (0, merge_request_info);
+            db.save_pipeline_status (0, PIPELINE_STATUS);
         } catch (AlpineQaBot.DatabaseError e) {
             error (e.message);
         }
@@ -60,13 +61,13 @@ void test_database_get_set_merge_request_info_existing_db () {
     {
         var db = new AlpineQaBot.SqliteDatabase ();
         try {
-            db.open ("%s/test_get_set_merge_request_info.db".printf (tmp_dir.file_path));
+            db.open ("%s/test_get_set_pipeline_status.db".printf (tmp_dir.file_path));
         } catch (AlpineQaBot.DatabaseError e) {
             error (e.message);
         }
         try {
-            var new_info = db.get_merge_request_info (0);
-            assert (new_info.pipeline_status == merge_request_info.pipeline_status);
+            var new_status = db.get_pipeline_status (0);
+            assert (new_status == PIPELINE_STATUS);
         } catch (AlpineQaBot.DatabaseError e) {
             error (e.message);
         }
@@ -78,13 +79,13 @@ void test_database_get_nonexistant_mr () {
 
     var db = new AlpineQaBot.SqliteDatabase ();
     try {
-        db.open ("%s/test_get_set_merge_request_info.db".printf (tmp_dir.file_path));
+        db.open ("%s/test_get_set_pipeline_status.db".printf (tmp_dir.file_path));
     } catch (AlpineQaBot.DatabaseError e) {
         error (e.message);
     }
     try {
-        var mr_info = db.get_merge_request_info (0);
-        assert_null (mr_info);
+        var pipeline_status = db.get_pipeline_status (0);
+        assert (pipeline_status == null);
     } catch (AlpineQaBot.DatabaseError e) {
         error (e.message);
     }
@@ -94,8 +95,8 @@ public void main (string[] args) {
     Test.init (ref args);
 
     Test.add_func ("/test/database/init", test_database_init);
-    Test.add_func ("/test/database/get_set_merge_request_info", test_database_get_set_merge_request_info);
-    Test.add_func ("/test/database/get_set_merge_request_info_existing_db", test_database_get_set_merge_request_info_existing_db);
+    Test.add_func ("/test/database/get_set_pipeline_status", test_database_get_set_pipeline_status);
+    Test.add_func ("/test/database/get_set_pipeline_status_existing_db", test_database_get_set_pipeline_status_existing_db);
     Test.add_func ("/test/database/get_nonexistant_mr", test_database_get_nonexistant_mr);
     Test.run ();
 }

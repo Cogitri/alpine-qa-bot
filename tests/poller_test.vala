@@ -137,7 +137,7 @@ void test_poller_poll_unmark_stale () {
     try {
         db.open ("%s/poller.db".printf (tmp_dir.file_path));
         // Shouldn't be unmarked - last activity after marking stale
-        db.save_stale_mark_time (63768870, new GLib.DateTime.now ().add_days (-1));
+        db.save_stale_mark_time (63768870, new GLib.DateTime.now ().add_days (1));
         // Should be unmarked - last activity now, after marking stale
         db.save_stale_mark_time (63528046, new GLib.DateTime.now ());
     } catch (GLib.Error e) {

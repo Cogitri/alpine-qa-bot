@@ -162,47 +162,6 @@ namespace AlpineQaBot {
         public string suggestion { get; private set; }
     }
 
-    public struct Author {
-
-        public Author (int64 id, string name, string username) {
-            this.id = id;
-            this.name = name;
-            this.username = username;
-        }
-
-        public Author.from_json_object (Json.Object root_obj) {
-            this.id = root_obj.get_int_member ("id");
-            this.name = root_obj.get_string_member ("name");
-            this.username = root_obj.get_string_member ("username");
-        }
-
-        public int64 id { get; private set; }
-        public string name { get; private set; }
-        public string username { get; private set; }
-    }
-
-    public struct Note {
-
-        public Note (Author author, string body, GLib.DateTime created_at, bool system) {
-            this.author = author;
-            this.body = body;
-            this.created_at = created_at;
-            this.system = system;
-        }
-
-        public Note.from_json_object (Json.Object root_obj) {
-            this.author = Author.from_json_object (root_obj.get_object_member ("author"));
-            this.body = root_obj.get_string_member ("body");
-            this.created_at = new GLib.DateTime.from_iso8601 (root_obj.get_string_member ("created_at"), null);
-            this.system = root_obj.get_boolean_member ("system");
-        }
-
-        public Author author { get; private set; }
-        public string body { get; private set; }
-        public GLib.DateTime created_at { get; private set; }
-        public bool system { get; private set; }
-    }
-
     public class RequestSender : GLib.Object {
         public RequestSender (string query_url, string http_method, string? api_authentication_token, uint8[]? data, Soup.Session? default_soup_session) {
             this.soup_session = default_soup_session ?? new Soup.Session ();

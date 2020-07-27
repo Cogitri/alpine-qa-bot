@@ -390,6 +390,18 @@ namespace AlpineQaBot {
                 }
             }
 
+            if (this.merge_request.state != MergeRequestState.Opened) {
+                debug ("Removing closed/merged MR from database...");
+
+                var db = new SqliteDatabase ();
+                try {
+                    db.open ("%s/poller.db".printf (Config.SHARED_STATE_DIR));
+                    db.delete_merge_request (this.merge_request.id);
+                } catch (DatabaseError e) {
+                    warning ("Failed to delete MR from database due to error %s", e.message);
+                    return false;
+                }
+            }
 
             return true;
         }

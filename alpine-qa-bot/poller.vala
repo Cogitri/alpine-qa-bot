@@ -97,7 +97,6 @@ namespace AlpineQaBot {
                         if (stale_mark_time.difference (last_update) >= GLib.TimeSpan.SECOND) {
                             res.add ((Job) new ActiveMergeRequestJob.from_json (Json.to_string (merge_request, false), gitlab_instance_url, api_auth_token));
                         }
-                        db.delete_stale_mark_time (id);
                     }
                 }
             } catch (GLib.Error e) {

@@ -27,6 +27,8 @@ namespace AlpineQaBot {
 
         public abstract void save_stale_mark_time(int64 id, GLib.DateTime stale_mark_time) throws DatabaseError;
 
+        public abstract void delete_merge_request(int64 id) throws DatabaseError;
+
     }
 
     public class SqliteDatabase : GLib.Object, Database {
@@ -126,6 +128,16 @@ namespace AlpineQaBot {
                 throw new DatabaseError.SAVE_FAILED ("Failed to set stale_mark_time to NULL in SQLite database due to error %s", errmsg);
             }
             this.delete_null_entries ();
+        }
+
+        public void delete_merge_request (int64 id) throws DatabaseError {
+            int rc;
+            string query = "DELETE FROM MR_Info WHERE id = %lld".printf (id);
+            string errmsg;
+
+            if ((rc = db.exec (query, null, out errmsg)) != Sqlite.OK) {
+                throw new DatabaseError.SAVE_FAILED ("Failed to set stale_mark_time to NULL in SQLite database due to error %s", errmsg);
+            }
         }
 
         private void delete_null_entries () throws DatabaseError {

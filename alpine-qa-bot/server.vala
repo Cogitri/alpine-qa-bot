@@ -5,7 +5,7 @@
  */
 namespace AlpineQaBot {
     public class WebHookEventListenerServer : Soup.Server {
-        public WebHookEventListenerServer (string gitlab_instance_url, string gitlab_token, string api_authentication_token, uint server_listen_port, int[] poller_project_ids) throws GLib.Error {
+        public WebHookEventListenerServer (string gitlab_instance_url, string gitlab_token, string api_authentication_token, uint server_listen_port, int[] poller_project_ids, uint poller_period) throws GLib.Error {
             Object ();
             assert (this != null);
 
@@ -21,7 +21,7 @@ namespace AlpineQaBot {
             if (poller_project_ids.length != 0) {
                 this.poller = new Poller (api_authentication_token, gitlab_instance_url);
 
-                GLib.Timeout.add_seconds (3600, () => {
+                GLib.Timeout.add_seconds (poller_period, () => {
                     foreach (var id in poller_project_ids) {
                         this.poller.poll.begin (id, null, Config.SHARED_STATE_DIR, null, (_, res) => {
                             Gee.ArrayList<Job> jobs = null;

@@ -34,7 +34,7 @@ void test_server_invalid_token_access_denied () {
 
     AlpineQaBot.WebHookEventListenerServer ev = null;
     try {
-        ev = new AlpineQaBot.WebHookEventListenerServer (instance_url, ONLINE_TEST_GITLAB_TOKEN, api_token, 8013, poller_ids);
+        ev = new AlpineQaBot.WebHookEventListenerServer (instance_url, ONLINE_TEST_GITLAB_TOKEN, api_token, 8013, poller_ids, 600);
     } catch (Error e) {
         error ("Failed to listen on port %u due to error %s", 8013, e.message);
     }
@@ -77,7 +77,7 @@ void test_server_merge_request_job_process () {
 
     AlpineQaBot.WebHookEventListenerServer ev = null;
     try {
-        ev = new AlpineQaBot.WebHookEventListenerServer (instance_url, ONLINE_TEST_GITLAB_TOKEN, api_token, 8014, poller_ids);
+        ev = new AlpineQaBot.WebHookEventListenerServer (instance_url, ONLINE_TEST_GITLAB_TOKEN, api_token, 8014, poller_ids, 600);
     } catch (Error e) {
         error ("Failed to listen on port %u due to error %s", 8014, e.message);
     }
@@ -130,7 +130,7 @@ void test_server_merge_request_job_invalid () {
 
     AlpineQaBot.WebHookEventListenerServer ev = null;
     try {
-        ev = new AlpineQaBot.WebHookEventListenerServer (instance_url, ONLINE_TEST_GITLAB_TOKEN, api_token, 8015, poller_ids);
+        ev = new AlpineQaBot.WebHookEventListenerServer (instance_url, ONLINE_TEST_GITLAB_TOKEN, api_token, 8015, poller_ids, 600);
     } catch (Error e) {
         error ("Failed to listen on port %u due to error %s", 8015, e.message);
     }
@@ -186,7 +186,7 @@ void test_server_job_unknown () {
 
     AlpineQaBot.WebHookEventListenerServer ev = null;
     try {
-        ev = new AlpineQaBot.WebHookEventListenerServer (instance_url, ONLINE_TEST_GITLAB_TOKEN, api_token, 8016, poller_ids);
+        ev = new AlpineQaBot.WebHookEventListenerServer (instance_url, ONLINE_TEST_GITLAB_TOKEN, api_token, 8016, poller_ids, 600);
     } catch (Error e) {
         error ("Failed to listen on port %u due to error %s", 8016, e.message);
     }
@@ -232,7 +232,7 @@ void test_server_landig_page_success () {
 
     AlpineQaBot.WebHookEventListenerServer ev = null;
     try {
-        ev = new AlpineQaBot.WebHookEventListenerServer ("", "", "", 8017, poller_ids);
+        ev = new AlpineQaBot.WebHookEventListenerServer ("", "", "", 8017, poller_ids, 600);
     } catch (Error e) {
         error ("Failed to listen on port %u due to error %s", 8017, e.message);
     }

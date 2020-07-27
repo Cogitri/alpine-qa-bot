@@ -20,11 +20,13 @@ public int main (string[] args) {
     string gitlab_instance_url = null;
     string gitlab_token = null;
     int[] poller_project_ids = {};
+    uint poller_period = 0;
     uint server_port = 0;
     try {
         authenication_token = key_file.get_string ("Server", "AuthenticationToken");
         gitlab_instance_url = key_file.get_string ("Server", "GitlabUrl");
         gitlab_token = key_file.get_string ("Server", "GitlabToken");
+        poller_period = key_file.get_integer ("Poller", "Period");
         poller_project_ids = key_file.get_integer_list ("Poller", "ProjectIds");
         server_port = key_file.get_integer ("Server", "Port");
     } catch (GLib.KeyFileError e) {
@@ -34,7 +36,7 @@ public int main (string[] args) {
     var loop = new MainLoop ();
     AlpineQaBot.WebHookEventListenerServer ev = null;
     try {
-        ev = new AlpineQaBot.WebHookEventListenerServer (gitlab_instance_url, gitlab_token, authenication_token, server_port, poller_project_ids);
+        ev = new AlpineQaBot.WebHookEventListenerServer (gitlab_instance_url, gitlab_token, authenication_token, server_port, poller_project_ids, poller_period);
     } catch (Error e) {
         error ("Failed to listen on port %u due to error %s", server_port, e.message);
     }
@@ -46,7 +48,7 @@ public int main (string[] args) {
         job.process.begin (null, (_, res) => {
             var successful = job.process.end (res);
             if (!successful) {
-                warning("Failed to process job %s", job.get_type().to_string());
+                warning ("Failed to process job %s", job.get_type ().to_string ());
             }
         });
     });

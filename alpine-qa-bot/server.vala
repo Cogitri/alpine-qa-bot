@@ -21,7 +21,7 @@ namespace AlpineQaBot {
             if (poller_project_ids.length != 0) {
                 this.poller = new Poller (api_authentication_token, gitlab_instance_url);
 
-                GLib.Timeout.add_seconds (poller_period, () => {
+                GLib.SourceFunc func = () => {
                     foreach (var id in poller_project_ids) {
                         this.poller.poll.begin (id, null, Config.SHARED_STATE_DIR, null, (_, res) => {
                             Gee.ArrayList<Job> jobs = null;
@@ -37,7 +37,11 @@ namespace AlpineQaBot {
                     }
 
                     return GLib.Source.CONTINUE;
-                });
+                };
+
+                func ();
+
+                GLib.Timeout.add_seconds (poller_period, (owned) func);
             }
         }
 

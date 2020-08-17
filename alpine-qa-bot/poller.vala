@@ -67,7 +67,7 @@ namespace AlpineQaBot {
             string json_reply;
             var db = new SqliteDatabase ();
             var parser = new Json.Parser ();
-            var query_url = "%s/api/v4/projects/%u/merge_requests?state=opened&labels=status:mr-stale&updated_after=%s".printf (this.gitlab_instance_url, project_id, default_date != null ? default_date.to_string () : new GLib.DateTime.now ().add_days (-14).to_string ());
+            var query_url = "%s/api/v4/projects/%u/merge_requests?state=opened&labels=status:mr-stale&updated_after=%s".printf (this.gitlab_instance_url, project_id, default_date != null ? default_date.to_string () : new GLib.DateTime.now ().add_days (-14).add_seconds (60).to_string ());
             var request_sender = new RequestSender (query_url, "GET", null, null, default_soup_session);
 
             db.open ("%s/poller.db".printf (db_dir));
@@ -94,7 +94,7 @@ namespace AlpineQaBot {
                     var stale_mark_time = db.get_stale_mark_time (id);
                     if (stale_mark_time != null) {
                         var last_update = new GLib.DateTime.from_iso8601 (merge_request.get_object ().get_string_member ("updated_at"), null);
-                        if (stale_mark_time.difference (last_update) >= GLib.TimeSpan.SECOND) {
+                        if (stale_mark_time.difference (last_update) >= GLib.TimeSpan.MINUTE) {
                             res.add ((Job) new ActiveMergeRequestJob.from_json (Json.to_string (merge_request, false), gitlab_instance_url, api_auth_token));
                         }
                     }

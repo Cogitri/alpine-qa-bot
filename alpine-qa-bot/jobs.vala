@@ -459,7 +459,7 @@ namespace AlpineQaBot {
         }
 
         public MergeRequest merge_request { get; private set; }
-        private const string STALE_MERGE_REQUEST_MESSAGE_TEMPLATE = "Hello%s,\\n\\nI've detected that this merge request hasn't seen any recent activity. As such, this MR has been marked as stale and might be closed in the future by maintainers. If you need more time simply comment here (possibly pinging `%s` if you need help) and the status:mr-stale label will be removed and you can keep working on this.\\n\\nThanks for your contribution.";
+        private const string STALE_MERGE_REQUEST_MESSAGE_TEMPLATE = "Sorry to bother you %s,\\n\\nbut we've detected that this merge request hasn't seen any recent activity. As such, this MR has been marked as stale and might be closed in the future by maintainers. If you need more time simply comment here (possibly pinging `%s` if you need help, or if your MR hasn't been reviewed yet) and the status:mr-stale label will be removed and you can keep working on this. You can also ask on IRC on #alpine-devel on Freenode.net.\\n\\nThanks for your contribution.";
     }
 
     class ActiveMergeRequestJob : Job {

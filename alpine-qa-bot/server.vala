@@ -29,6 +29,7 @@ namespace AlpineQaBot {
                                 jobs = this.poller.poll.end (res);
                             } catch (DatabaseError e) {
                                 warning ("Failed to poll for changes due to error %s", e.message);
+                                return;
                             }
                             foreach (var job in jobs) {
                                 this.job_received (job);
